@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+      <script type="text/javascript">
+        var current_sheet = 'Supervisory Organizations';
+      </script>
+      <link type="text/css" rel="stylesheet" href="../resources/WDCT_SlickGrid/slick.grid.css" />
+      <link type="text/css" rel="stylesheet" href="../resources/WDCT_SlickGrid/css/smoothness/jquery-ui-1.8.24.custom.css" />
+      <link type="text/css" rel="stylesheet" href="../resources/WDCT_SlickGrid/slick-default-theme.css" />
+      <link type="text/css" rel="stylesheet" href="../resources/WDCT_SlickGrid/plugins/slick.headermenu.css" />
+      <link type="text/css" rel="stylesheet" href="../resources/WDCT_SlickGrid/controls/slick.pager.css" />
+      <link type="text/css" rel="stylesheet" href="../resources/WDCT_SlickGrid/controls/slick.columnpicker.css" /> 
+      <link type="text/css" rel="stylesheet" href="../resources/WDCT_SlickGrid/plugins/slick.headerbuttons.css"/>
+      <link type="text/css" rel="stylesheet" href="../resources/slickgrid-spreadsheet-plugins-master/plugins-common.css"  />
+      <link type="text/css" rel="stylesheet" href="../resources/slickgrid-spreadsheet-plugins-master/plugins-gdoc-style.css" />
+      <link type="text/css" rel="stylesheet" href="../resources/custom_css.css" />
+        
+      <script type="text/javascript" src="../resources/cloneany/libs/jquery.js"></script>    
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/firebugx.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/jquery-1.7.min.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/jquery-ui-1.8.24.custom.min.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/jquery.event.drag-2.2.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/jquery.event.drop-2.2.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/jquery.mousewheel.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/slick.core.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/plugins/slick.autotooltips.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/plugins/slick.cellrangedecorator.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/plugins/slick.cellcopymanager.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/plugins/slick.rowselectionmodel.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/plugins/slick.rowmovemanager.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/plugins/slick.headermenu.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/plugins/slick.headerbuttons.js"></script>
+      
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/slick.dataview.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/controls/slick.pager.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/controls/slick.columnpicker.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/slick.formatters.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/slick.editors.js"></script>
+      <script type="text/javascript" src="../resources/WDCT_SlickGrid/slick.grid.new.js"></script>
+       
+      
+      <script type="text/javascript" src="../resources/jquery.csv.js"></script>
+  	<!-- uncomment the next line here and in xlsxworker.js for encoding support -->
+  	<script type="text/javascript" src="../resources/jsXLSX/dist/cpexcel.js"></script>
+  	<script type="text/javascript" src="../resources/jsXLSX/shim.js"></script>
+  	<script type="text/javascript" src="../resources/jsXLSX/jszip.js"></script>
+  	<script type="text/javascript" src="../resources/jsXLSX/xlsx.js"></script>
+  	<script type="text/javascript" src="../resources/jquery_extentions2.js"></script>
+  	<script type="text/javascript" src="../resources/javascript_extentions.js"></script>
+  	<script type="text/javascript" src="../resources/skilleditor.js"></script>
+  	<script type="text/javascript" src="../resources/milestoneeditor.js"></script>
+  	<script type="text/javascript" src="../resources/phaseselectioneditor.js"></script>
+  	<script type="text/javascript" src="../resources/autocompleteeditor.js"></script>
+  	<script type="text/javascript" src="../resources/autofilleditor.js"></script>
+  	<script type="text/javascript" src="../resources/xlsx_extentions.js"></script>
+  	<script type="text/javascript" src="../resources/FileSaver.js"></script>
+  	
+  	<script type="text/javascript" src="../resources/slickgrid-spreadsheet-plugins-master/scripts/underscore.js"></script>
+  	<script type="text/javascript" src="../resources/slickgrid-spreadsheet-plugins-master/ext.headerfilter.js"></script>
+    <script type="text/javascript" src="../resources/slickgrid-spreadsheet-plugins-master/ext.overlays.js"></script>
+  	<!-- 
+  	<script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/js/require.js"></script>
+  	<script type="text/javascript" src="../resources/WDCT_SlickGrid/lib/js/underscore.js"></script>
+      <script type="text/javascript">
+          requirejs.config({
+                          baseUrl: '../resources/WDCT_SlickGrid/lib/js'  //give the location of the folder which contains require, excel-builder, etc
+                      });
+      </script>
+       -->
+      <script type="text/javascript" src="config.js"></script>
+      <!-- script type="text/javascript" src="../resources/reference.js"></script-->
+      <script type="text/javascript" src="../resources/WDCT_Timeline2ver.js"></script>
+
+  
+
+  </head>
+  <body>
+  	<div id="input_section" style="display:flex">
+  			
+  			<div style="width:100%;padding-left:5px;padding-right:5px;">
+  			   <div style="float:left;">
+  			   <a href="../index.html">Go to Index</a>&nbsp;&nbsp;
+  			   click here to select a file: <input type="file" name="xlfile" id="xlf" />
+  			   </div>
+  			   <div style="float:right;">
+  			   <span>Current sheet has <span id="errors"></span> errors.</span>
+  			   <a id='downloadLink'></a>
+               <a id="" href="javascript:void(0);" class="excel_button" style="display:inline-block;" title="Download grid in Excel format" onclick="return WDCT_Timeline.downloadExcel_Click();">Download XLSX</a>
+               </div>
+  			</div> 
+  			
+  			
+  	</div>
+  	<div id="myGrid" style="width:100%;min-height:300px;"></div>
+  	<div id="pager"></div>
+  	
+  	
+  	<div id="contextMenu" style="display:none;position:absolute">
+      <strong>Apply Functions:</strong>
+      <br/>
+      <div style="display:inline-block;">
+        <div style="width:100%">
+          <div style="float:left;"><b>Replace all</b>&nbsp;<input id="replace_input1" value=""/>&nbsp;with&nbsp;<input id="replace_input2" value=""/></div>
+          <div style="float:right;"><button id="replace_btn" onclick="return false;" data="REPLACE">Apply</button></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"><b>Fill</b>&nbsp;value&nbsp;<input id="fill_input" value=""/></div>
+          <div style="float:right;"><button id="fill_btn" onclick="return false;" data="FILL">Apply</button></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"><b>Prefix</b> the values with&nbsp;<input id="prefix_input" value=""/></div>
+          <div style="float:right;"><button id="prefix_btn" onclick="return false;" data="PREFIX">Apply</button></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"><b>Clear</b> all the selected items?</div>
+          <div style="float:right;"><button id="clear_btn" onclick="return false;" data="CLEAR">Clear</button></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"></div>
+          <div style="float:right;"></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"></div>
+          <div style="float:right;"></div>
+        </div>
+      </div> 
+    </div>
+  </body>
+</html>

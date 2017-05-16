@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+      <!--link type="text/css" rel="stylesheet" href="StaticResources/E2_SLDS1/assets/styles/salesforce-lightning-design-system.min.css" /-->
+      <link type="text/css" rel="stylesheet" href="StaticResources/WDCT_SlickGrid/slick.grid.css" />
+      <link type="text/css" rel="stylesheet" href="StaticResources/WDCT_SlickGrid/css/smoothness/jquery-ui-1.8.24.custom.css" />
+      <link type="text/css" rel="stylesheet" href="StaticResources/WDCT_SlickGrid/slick-default-theme.css" />
+      <link type="text/css" rel="stylesheet" href="StaticResources/WDCT_SlickGrid/plugins/slick.headermenu.css" />
+      <link type="text/css" rel="stylesheet" href="StaticResources/WDCT_SlickGrid/controls/slick.pager.css" />
+      <link type="text/css" rel="stylesheet" href="StaticResources/WDCT_SlickGrid/controls/slick.columnpicker.css" /> 
+      <link type="text/css" rel="stylesheet" href="StaticResources/WDCT_SlickGrid/plugins/slick.headerbuttons.css"/>
+      <script>
+        var current_sheet = 'employee data';
+      </script>
+      <script type="text/javascript" src="StaticResources/cloneany/libs/jquery.js"></script>    
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/firebugx.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/jquery-1.7.min.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/jquery-ui-1.8.24.custom.min.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/jquery.event.drag-2.2.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/jquery.event.drop-2.2.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/jquery.mousewheel.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/slick.core.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/plugins/slick.autotooltips.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/plugins/slick.cellrangedecorator.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/plugins/slick.cellcopymanager.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/plugins/slick.rowselectionmodel.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/plugins/slick.rowmovemanager.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/plugins/slick.headermenu.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/plugins/slick.headerbuttons.js"></script>
+      
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/slick.dataview.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/controls/slick.pager.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/controls/slick.columnpicker.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/slick.formatters.js"></script>
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/slick.editors.js"></script>
+      <!--script type="text/javascript" src="StaticResources/WDCT_SlickGrid/slick.grid.js"></script-->
+      <script type="text/javascript" src="StaticResources/WDCT_SlickGrid/slick.grid.new.js"></script>
+       
+      
+      <script type="text/javascript" src="jquery.csv.js"></script>
+  	<!-- uncomment the next line here and in xlsxworker.js for encoding support -->
+  	<script type="text/javascript" src="StaticResources/jsXLSX/dist/cpexcel.js"></script>
+  	<script type="text/javascript" src="StaticResources/jsXLSX/shim.js"></script>
+  	<script type="text/javascript" src="StaticResources/jsXLSX/jszip.js"></script>
+  	<script type="text/javascript" src="StaticResources/jsXLSX/xlsx.js"></script>
+  	<script type="text/javascript" src="jquery_extentions2.js"></script>
+  	<script type="text/javascript" src="javascript_extentions.js"></script>
+  	<script type="text/javascript" src="skilleditor.js"></script>
+  	<script type="text/javascript" src="milestoneeditor.js"></script>
+  	<script type="text/javascript" src="phaseselectioneditor.js"></script>
+  	<script type="text/javascript" src="autocompleteeditor.js"></script>
+  	<script type="text/javascript" src="autofilleditor.js"></script>
+  	<script type="text/javascript" src="xlsx_extentions.js"></script>
+  	<script type="text/javascript" src="FileSaver.js"></script>
+  	
+  	<!-- 
+  	<script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/js/require.js"></script>
+  	<script type="text/javascript" src="StaticResources/WDCT_SlickGrid/lib/js/underscore.js"></script>
+      <script type="text/javascript">
+          requirejs.config({
+                          baseUrl: 'StaticResources/WDCT_SlickGrid/lib/js'  //give the location of the folder which contains require, excel-builder, etc
+                      });
+      </script>
+       -->
+      <script type="text/javascript" src="regex.js"></script>
+      <script type="text/javascript" src="reference.js"></script>
+      <script type="text/javascript" src="WDCT_Timeline2ver.js"></script>
+
+  	<style>
+  	#drop{
+  		border:2px dashed #bbb;
+  		-moz-border-radius:5px;
+  		-webkit-border-radius:5px;
+  		border-radius:5px;
+  		padding:25px;
+  		text-align:center;
+  		font:20pt bold,"Vollkorn";color:#bbb
+  	}
+  	#b64data{
+  		width:100%;
+  	}
+  	
+  	body{
+  	 margin:0px;
+  	}
+  	
+  	.ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+  	    font-family: Verdana,Arial,sans-serif;
+  	    font-size: .8em;
+  	}
+  	
+  	.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button{
+  	  font-size:1em;
+  	  width:96%;
+  	}
+  	
+  	.slick-cell.active {
+  	  padding:0px;
+  	}
+  	.slick-gray_background{
+  	  background-color:#ccc!important;
+  	}
+  	
+  	.frmt-invalid {
+  	    border-collapse: collapse;
+  	    border-color: red;
+  	    border-width: 0.5px;
+  	    border-style: dotted;
+  	    -moz-animation-duration: 0.2s;
+  	    -webkit-animation-duration: 0.2s;
+  	    -moz-animation-name: slickgrid-invalid-hilite;
+  	    -webkit-animation-name: slickgrid-invalid-hilite;
+  	}
+  	
+  	
+  	.loading-indicator {
+  	    display: inline-block;
+  	    padding: 12px;
+  	    background: white;
+  	    -opacity: 0.5;
+  	    color: black;
+  	    font-weight: bold;
+  	    z-index: 9999;
+  	    border: 1px solid red;
+  	    -moz-border-radius: 10px;
+  	    -webkit-border-radius: 10px;
+  	    -moz-box-shadow: 0 0 5px red;
+  	    -webkit-box-shadow: 0px 0px 5px red;
+  	    -text-shadow: 1px 1px 1px white;
+  	}
+  	
+  	.loading-indicator label {
+  	    padding-left: 20px;
+  	    
+  	}
+  	/**
+       * Style the drop-down menu here since the plugin stylesheet mostly contains structural CSS.
+       */
+      .slick-header-menu {
+        border: 1px solid #718BB7;
+        background: #f0f0f0;
+        padding: 2px;
+        -moz-box-shadow: 2px 2px 2px silver;
+        -webkit-box-shadow: 2px 2px 2px silver;
+        min-width: 100px;
+        z-index: 20;
+      }
+      .slick-header-menuitem {
+        padding: 2px 4px;
+        border: 1px solid transparent;
+        border-radius: 3px;
+      }
+      .slick-header-menuitem:hover {
+        border-color: silver;
+        background: white;
+      }
+      .slick-header-menuitem-disabled {
+        border-color: transparent !important;
+        background: inherit !important;
+      }
+      
+      
+      #contextMenu {
+        background: #e1efc7;
+        border: 1px solid gray;
+        padding: 2px;
+        display: inline-block;
+        min-width: 320px;
+        -moz-box-shadow: 2px 2px 2px silver;
+        -webkit-box-shadow: 2px 2px 2px silver;
+        z-index: 99999;
+        max-width: 390px;
+        font-size:12px;
+        
+      }
+
+  .slick-headerrow-column {
+        background: #eee;
+        text-overflow: clip;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      .slick-headerrow-column input {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      
+  	</style>
+
+  </head>
+  <body>
+  	<div id="input_section" style="display:flex">
+  			<div style="width:50%" id="drop">Drop a spreadsheet file here to see sheet data</div>
+  			<div style="width:50%">
+  			   <p id="choose">&nbsp;&nbsp;<input type="file" name="xlfile" id="xlf" /> ... or click here to select a file</p>
+  			   <p>Current sheet has <span id="errors"></span> errors.</p>
+  			   <a id='downloadLink'></a>
+                 <a id="" href="javascript:void(0);" class="excel_button" style="display:inline-block;" title="Download grid in Excel format" onclick="return WDCT_Timeline.downloadExcel_Click();">Download XLSX</a>
+  			</div> 
+  			
+  			<pre id="out"></pre>
+  	</div>
+  	<div id="myGrid" style="width:100%;min-height:300px;"></div>
+  	<div id="pager" style="width:99%;height:20px;"></div>
+  	
+  	
+  	<div id="contextMenu" style="display:none;position:absolute">
+      <strong>Apply Functions:</strong>
+      <br/>
+      <div style="display:inline-block;">
+        <div style="width:100%">
+          <div style="float:left;"><b>Fill</b>value&nbsp;<input id="fill_input" value=""/></div>
+          <div style="float:right;"><button id="fill_btn" onclick="return false;" data="FILL">Apply</button></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"><b>Prefix</b> the values with&nbsp;<input id="prefix_input" value=""/></div>
+          <div style="float:right;"><button id="prefix_btn" onclick="return false;" data="PREFIX">Apply</button></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"><b>Clear</b> all the selected items?</div>
+          <div style="float:right;"><button id="clear_btn" onclick="return false;" data="CLEAR">Clear</button></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"></div>
+          <div style="float:right;"></div>
+        </div>
+        <div style="width:100%">
+          <div style="float:left;"></div>
+          <div style="float:right;"></div>
+        </div>
+      </div> 
+    </div>
+  </body>
+</html>
