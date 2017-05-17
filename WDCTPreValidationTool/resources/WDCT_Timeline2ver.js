@@ -172,7 +172,7 @@ var WDCT_Timeline = {
 				if(val.trim() != '') isValidRow = true;
 				obj[_jindx] = row[_jindx];
 				objErr[_jindx] = false;
-				//objErr[_jindx] = WDCT_Timeline.hasError(obj, _jindx, row[_jindx]);
+				objErr[_jindx] = WDCT_Timeline.hasError(obj, _jindx, row[_jindx]);
 				
 			}
 			
@@ -944,20 +944,17 @@ var WDCT_Timeline = {
     },
     
     renderGrid: function(){
-    	WDCT_Timeline.errorsCount = 0;
-        grid.render();
-        console.log('me render');
+    	grid.render();
+        //console.log('me render');
         WDCT_Timeline.setAndDisplayErrorCount();
     },
     asyncPostRenderHandler: function(cellNode, row, dataContext, colDef) {
-    	//var data = grid.getData();
+    	/**
     	var cell = colDef.id;
     	var value = dataContext[cell];
-    	//console.log('cell::' + cell + ', value:::' + value);
+    	
     	if(cell != 'id'){
-    	  //console.log('i am in');	
-    	  //dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
-    	  //console.log('check condition::::' + dataErr[row][cell]);
+    	 
     	  if(dataErr[row][cell]){
     		  $(cellNode).addClass('frmt-invalid');
       	  }else{
@@ -966,11 +963,14 @@ var WDCT_Timeline = {
     	}else{
     		$(cellNode).removeClass('frmt-invalid');
     	}
-    	
+    	**/
     },
     validateFormatter: function(row, cell, value, columnDef, dataContext) {
     	
     	dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
+    	if(dataErr[row][cell]){
+    		return "<div class='frmt-invalid' style='width:100%;'>" + value + "</div>";
+    	}
     	/**
     	var data = grid.getData();
     	dataErr[row][cell] = WDCT_Timeline.hasError(data.getItem(row), cell, value);
