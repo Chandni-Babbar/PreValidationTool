@@ -732,8 +732,8 @@ var WDCT_Timeline = {
   
   
   onCellChangeHandler: function(e, args){
-	  WDCT_Timeline.onBeforeEditCellHandler(e, args);
-	  WDCT_Timeline.setAndDisplayErrorCount();
+	  //WDCT_Timeline.onBeforeEditCellHandler(e, args);
+	  //WDCT_Timeline.setAndDisplayErrorCount();
 	  
   },
   
@@ -817,63 +817,7 @@ var WDCT_Timeline = {
   	isInvalid = WDCT_Timeline.hasValidValuesError(rowObj, cell, value);
   	
   	
-  	/**
-  	// return if field is optional and empty
-    if(typeof requredArr[cell] != UNDEFINED && requredArr[cell].trim() != '' &&
-  			requredArr[cell].trim().toLowerCase() != REQUIRED && value.trim() == ''){
-  		return isInvalid;
-  	}
   	
-    // check for required validation
-  	if(typeof requredArr[cell] != UNDEFINED && requredArr[cell].trim() != '' &&
-  			requredArr[cell].trim().toLowerCase() == REQUIRED && value.trim() == ''){
-  		isInvalid = true;
-  		// check for datatype validations
-  	}else if(typeof dataTypeArr[cell] != UNDEFINED && dataTypeArr[cell].trim() != '' &&
-  			  typeof WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()] != UNDEFINED && 
-  			WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()] != '' &&
-  			WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()].test(value.trim()) == false){
-  		
-  		isInvalid = true;
-  	}else if(typeof columnArr[cell] != UNDEFINED && columnArr[cell].trim() != '' &&
-			  typeof WDCT_HEADER_REGEX[columnArr[cell].trim().toUpperCase()] != UNDEFINED && 
-			  WDCT_HEADER_REGEX[columnArr[cell].trim().toUpperCase()] != '' &&
-			  WDCT_HEADER_REGEX[columnArr[cell].trim().toUpperCase()].test(value.trim()) == false){
-	  		
-	  		isInvalid = true;
-	}else if(typeof lookup_sheets_data != UNDEFINED &&
-			 typeof lookup_sheets_data[cell] != UNDEFINED && 
-			 typeof value != UNDEFINED && 
-			 typeof lookup_sheets_data[cell][value] == UNDEFINED){
-		    isInvalid = true;
-		//check for Phone Formats
-	}else if(typeof WDCT_RELATEDVALIDATIONS != UNDEFINED &&
-		     typeof WDCT_RELATEDVALIDATIONS[cell] != UNDEFINED && 
-		     typeof value != UNDEFINED){
-
-		  var lookupCell = WDCT_RELATEDVALIDATIONS[cell]["LOOKUPINDEX"];
-		  var lookupCellValue = rowObj[lookupCell];
-
-		  if(lookupCellValue != ''){
-			  var typeofCheck = WDCT_RELATEDVALIDATIONS[cell]["TYPE"];
-			  var validationRule = WDCT_RELATEDVALIDATIONS[cell]["VALIDATIONRULE"];
-
-			  if(typeofCheck == 'MAP' && 
-			  	              typeof validationRule != UNDEFINED &&     
-			  	              typeof validationRule[lookupCellValue.toUpperCase()] != UNDEFINED &&
-			  	                           validationRule[lookupCellValue.toUpperCase()] != value){
-	                // considering validationRule is a collection/map
-                     isInvalid = true; 
-			  }else if(typeofCheck == 'MAP_REGEX' &&
-			  	typeof validationRule != UNDEFINED &&
-			  	typeof validationRule[lookupCellValue.toUpperCase()] != UNDEFINED &&
-			  	validationRule[lookupCellValue.toUpperCase()].test(value.trim()) == false){
-	              isInvalid = true;
-			  }
-          }   
-
-	}
-  	**/
   	//console.log("**********" + );
 
   	return isInvalid;
@@ -934,17 +878,11 @@ var WDCT_Timeline = {
          groupName: " ",
          header: {
         	    buttons: [],
-        	    menu: {
-	        	        items: [
-	        	          { 
-	        	            title: "Select Rows",
-	        	            command: "select_rows"
-	        	          }
-	        	        ]
-	        	      }
+        	    
         	    },
          headerCssClass: ""
          ,formatter: WDCT_Timeline.validateFormatter
+         ,asyncPostRender: WDCT_Timeline.asyncPostRenderHandler
      }
 	 
 	 if(typeof requiredText != UNDEFINED && requiredText.toLowerCase() == 'required'){
@@ -989,8 +927,8 @@ var WDCT_Timeline = {
           enableColumnReorder: false
           ,forceFitColumns : false
           ,headerRowHeight : 30
-          ,enableAsyncPostRender: false
-          ,asyncPostRenderDelay : 50 // default 50
+          ,enableAsyncPostRender: true
+          ,asyncPostRenderDelay : 20 // default 50
           //,leaveSpaceForNewRows : true
           //,frozenColumn : 4
           //,frozenRow : 3
@@ -1008,16 +946,39 @@ var WDCT_Timeline = {
     renderGrid: function(){
     	WDCT_Timeline.errorsCount = 0;
         grid.render();
+        console.log('me render');
         WDCT_Timeline.setAndDisplayErrorCount();
     },
-    
+    asyncPostRenderHandler: function(cellNode, row, dataContext, colDef) {
+    	//var data = grid.getData();
+    	var cell = colDef.id;
+    	var value = dataContext[cell];
+    	//console.log('cell::' + cell + ', value:::' + value);
+    	if(cell != 'id'){
+    	  //console.log('i am in');	
+    	  //dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
+    	  //console.log('check condition::::' + dataErr[row][cell]);
+    	  if(dataErr[row][cell]){
+    		  $(cellNode).addClass('frmt-invalid');
+      	  }else{
+      		$(cellNode).removeClass('frmt-invalid');
+      	  }
+    	}else{
+    		$(cellNode).removeClass('frmt-invalid');
+    	}
+    	
+    },
     validateFormatter: function(row, cell, value, columnDef, dataContext) {
+    	
+    	dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
+    	/**
     	var data = grid.getData();
     	dataErr[row][cell] = WDCT_Timeline.hasError(data.getItem(row), cell, value);
     	if(dataErr[row][cell]){
     		return "<div class='frmt-invalid' style='width:100%;'>" + value + "</div>";
     	}
     	//WDCT_Timeline.setAndDisplayErrorCount();
+    	**/
     	return value;
     }, 
     
