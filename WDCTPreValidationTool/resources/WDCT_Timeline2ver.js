@@ -747,16 +747,7 @@ var WDCT_Timeline = {
         
         isInvalid = true;
       }
-
-      /**
-      if(typeof dataTypeArr[cell] != UNDEFINED && dataTypeArr[cell].trim() != '' &&
-          typeof WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()] != UNDEFINED && 
-        WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()] != '' &&
-        WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()].test(value.trim()) == false){
       
-        isInvalid = true;
-      }    
-      **/
       return isInvalid;
   },
 
@@ -764,27 +755,55 @@ var WDCT_Timeline = {
 
   hasValidValuesError: function(rowObj, cell, value){
     var isInvalid = false;
+    
+    
     if(typeof WDCT_RELATEDVALIDATIONS != UNDEFINED &&
          typeof WDCT_RELATEDVALIDATIONS[cell] != UNDEFINED && 
          typeof value != UNDEFINED){
+      
       var lookupCell = WDCT_RELATEDVALIDATIONS[cell]["LOOKUPINDEX"];
       var lookupCellValue = rowObj[lookupCell];
       if(lookupCellValue != ''){
-        var typeofCheck = WDCT_RELATEDVALIDATIONS[cell]["TYPE"];
-        var validationRule = WDCT_RELATEDVALIDATIONS[cell]["VALIDATIONRULE"];
-        if(typeofCheck == 'MAP' && 
-                        typeof validationRule != UNDEFINED &&     
-                        typeof validationRule[lookupCellValue.toUpperCase()] != UNDEFINED &&
-                                     validationRule[lookupCellValue.toUpperCase()] != value){
-                  // considering validationRule is a collection/map
-                     isInvalid = true; 
-        }else if(typeofCheck == 'MAP_REGEX' &&
-          typeof validationRule != UNDEFINED &&
-          typeof validationRule[lookupCellValue.toUpperCase()] != UNDEFINED &&
-          validationRule[lookupCellValue.toUpperCase()].test(value.trim()) == false){
-                isInvalid = true;
-        }
-          }
+	        var typeofCheck = WDCT_RELATEDVALIDATIONS[cell]["TYPE"];
+	        var validationRule = WDCT_RELATEDVALIDATIONS[cell]["VALIDATIONRULE"];
+	        if(typeofCheck == 'MAP' && 
+	                        typeof validationRule != UNDEFINED &&     
+	                        typeof validationRule[lookupCellValue.toUpperCase()] != UNDEFINED &&
+	                                     validationRule[lookupCellValue.toUpperCase()] != value){
+	                  // considering validationRule is a collection/map
+	                     isInvalid = true; 
+	        }else if(typeofCheck == 'MAP_REGEX' &&
+	          typeof validationRule != UNDEFINED &&
+	          typeof validationRule[lookupCellValue.toUpperCase()] != UNDEFINED &&
+	          validationRule[lookupCellValue.toUpperCase()].test(value.trim()) == false){
+	                isInvalid = true;
+	        
+	        }else if(typeofCheck == 'DATECOMPARE' &&
+	        	  typeof validationRule != UNDEFINED &&
+	        	  validationRule == 'LESSTHAN'){
+	        	
+	        	try{
+	        	  var base_date = new Date(value); 
+	        	  var compare_date = new Date(lookupCellValue);
+	        	  if(base_date >= compare_date) isInvalid = true;
+	        	}catch(ex) {
+	        		isInvalid = true;
+	        	}
+	        	
+	        }else if(typeofCheck == 'DATECOMPARE' &&
+		        	  typeof validationRule != UNDEFINED &&
+		        	  validationRule == 'GREATERTHAN'){
+		        	
+		        	try{
+		        	  var base_date = new Date(value); 
+		        	  var compare_date = new Date(lookupCellValue);
+		        	  if(base_date < compare_date) isInvalid = true;
+		        	}catch(ex) {
+		        		isInvalid = true;
+		        	}
+		        	
+		     }
+       }
     }
 
    if(typeof columnArr[cell] != UNDEFINED && columnArr[cell].trim() != '' &&
@@ -814,12 +833,9 @@ var WDCT_Timeline = {
   	
   	
   	isInvalid = WDCT_Timeline.hasDataTypeError(rowObj, cell, value);
-  	isInvalid = WDCT_Timeline.hasValidValuesError(rowObj, cell, value);
   	
+  	if(!isInvalid) isInvalid = WDCT_Timeline.hasValidValuesError(rowObj, cell, value);
   	
-  	
-  	//console.log("**********" + );
-
   	return isInvalid;
   },
   
