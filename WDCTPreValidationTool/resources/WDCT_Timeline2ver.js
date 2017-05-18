@@ -6,7 +6,7 @@ var columnArrRowIndex = 2;
 var contextArrRowIndex = 3;
 var dataTypeArrRowIndex = 4;
 var requredArrRowIndex = 5;
-
+var inputfile_htmlclientId = 'xlf';
 var dataErr = [];
 var columns = [];
 var loadingIndicator = null;
@@ -25,14 +25,17 @@ var grid_clientId = '#myGrid';
 var UNDEFINED = 'undefined';
 var pager_clientId = '#pager';
 var contextmenu_clientId = '#contextMenu';
-var default_columns = [
-    {
-      id: "selector",
-      name: "",
-      field: "num",
-      width: 30
-    }
-  ];
+var body_tag = 'body';
+var id_tag = 'id';
+var change_event = 'change';
+var blur_event = 'blur';
+var applying_configurations_msg = 'Applying configurations...';
+var unload_msg = "All the chances on this page will lost on navigation, we recommend to export before navigating.\nAre you sure you want to navigate away?";
+var preparing_to_load_msg = 'Preparing to load. Please wait..';
+var lastChunkMergeText = '{lastChunk}';
+var _resLenMergeText = '{_resLen}';
+var processing_continue_msg = 'Processed ::' + lastChunkMergeText + ' out of ' + _resLenMergeText + ' records..';
+
 //var xlsx_ws = {};
 var xlsx_ws = [];
 var xlsx_range = {s: {c:10000000, r:10000000}, e: {c:0, r:0 }};
@@ -59,124 +62,107 @@ var WDCT_Timeline = {
   },
   
   onDomReady: function(){
-	    /**var drop = document.getElementById('drop');
-		if(drop.addEventListener) {
-			drop.addEventListener('dragenter', WDCT_Timeline.handleDragover, false);
-			drop.addEventListener('dragover', WDCT_Timeline.handleDragover, false);
-			drop.addEventListener('drop', WDCT_Timeline.handleDrop, false);
-		}
-		**/
-		var xlf = document.getElementById('xlf');
-		if(xlf.addEventListener) xlf.addEventListener('change', WDCT_Timeline.handleFile, false);
+	   
+		var xlf = document.getElementById(inputfile_htmlclientId);
+		if(xlf.addEventListener) xlf.addEventListener(change_event, WDCT_Timeline.handleFile, false);
 		
-	    // Bind the window resize event to adjust the with of all the iframes with the resized 
-	    // width of the window
-	    // on screen for good user experience
 	    $( window ).resize(WDCT_Timeline.window_ResizeHandler);	    
 	    WDCT_Timeline.resizeGrid();
 	    // undo shortcut
 	    $(document).keydown(WDCT_Timeline.document_keyDownHandler);
-	 // document click event to save chnages in grid when moved outside gird : 
+	    // document click event to save chnages in grid when moved outside gird : 
 	    $(document).click(WDCT_Timeline.document_ClickHandler);  
-	    $("body").click(WDCT_Timeline.body_ClickHandler);
+	    $(body_tag).click(WDCT_Timeline.body_ClickHandler);
 	    $(contextmenu_clientId).click(WDCT_Timeline.contextMenuClickHandler);
 	    WDCT_Timeline.reFreshGrid();
-	    
-	    //$( window ).unload(WDCT_Timeline.window_UnLoadHandler);
-	    
-	    window.onbeforeunload = function() {
-	    	  return "All the chances on this page will lost on navigation, we recommend to export before navigating.\nAre you sure you want to navigate away?";
-	    	}
+	    window.onbeforeunload = WDCT_Timeline.window_UnLoadHandler;
+	    $(grid_clientId).on(blur_event, WDCT_Timeline.grid_BlurHandler);
  },
-  window_UnLoadHandler: function(){
-	  return false;
-	  
+ grid_BlurHandler:function(e){
+	 Slick.GlobalEditorLock.commitCurrentEdit();
   },
-  process_wb: function(wb) {
-	  
-	  res = to_multiArray(wb, current_sheet);
-	  
-	  setTimeout(function(){
-		global_wb = wb;
-		
-		
-		loader.showMore('Applying configurations...');
-		//console.log(res);
-		lookup_sheets_data = {};
-		
-		
-		if(typeof WDCT_LookUpConfig != UNDEFINED && 
-				typeof WDCT_LookUpConfig[current_sheet.toUpperCase()] != UNDEFINED){
-		    var colConfig = WDCT_LookUpConfig[current_sheet.toUpperCase()];	
-		
-			for(var _a in colConfig){
-				lookup_sheets_data[_a] = {};
-				var sheetName = colConfig[_a].sheet;
-				var col = colConfig[_a].col;
-				var sheet_data = to_multiArray(wb, sheetName);
-				
-				for(var _indx = data_startindex, len = sheet_data.length; _indx < len; _indx++){
-					lookup_sheets_data[_a][sheet_data[_indx][col]] = sheet_data[_indx][col];
+  window_UnLoadHandler: function(e){
+	  var dialogText =  unload_msg;
+	  e.returnValue = dialogText;
+	  return dialogText;
+  },
+  process_wb_callback: function(wb, current_sheet){
+	  return (function(){
+		    global_wb = wb;
+			loader.showMore(applying_configurations_msg);
+			lookup_sheets_data = {};
+			
+			if(typeof WDCT_LookUpConfig != UNDEFINED && 
+					typeof WDCT_LookUpConfig[current_sheet.toUpperCase()] != UNDEFINED){
+			    var colConfig = WDCT_LookUpConfig[current_sheet.toUpperCase()];	
+			
+				for(var _a in colConfig){
+					lookup_sheets_data[_a] = {};
+					var sheetName = colConfig[_a].sheet;
+					var col = colConfig[_a].col;
+					var sheet_data = to_multiArray(wb, sheetName);
+					
+					for(var _indx = data_startindex, len = sheet_data.length; _indx < len; _indx++){
+						lookup_sheets_data[_a][sheet_data[_indx][col]] = sheet_data[_indx][col];
+					}
+					sheetName = null;
+					col = null;
+					sheet_data = null;
 				}
-				sheetName = null;
-				col = null;
-				sheet_data = null;
+			} 
+			
+			columnArr = res[columnArrRowIndex];
+			contextArr = res[contextArrRowIndex];
+			dataTypeArr = res[dataTypeArrRowIndex];
+			requredArr = res[requredArrRowIndex];
+			
+			columns = [];
+			
+			for(var _indx = 0, len = columnArr.length; _indx < len; _indx++){
+				var col = columnArr[_indx];
+				// do not push column where column name is not defined
+				if(col.trim() == '') continue;
+				columns.push(WDCT_Timeline.getColumnDefination(_indx, _indx, col, dataTypeArr[_indx], requredArr[_indx], contextArr[_indx]));
 			}
-		} 
-		
-		
-		//console.log(lookup_sheets_data);
-		
-		columnArr = res[columnArrRowIndex];
-		contextArr = res[contextArrRowIndex];
-		dataTypeArr = res[dataTypeArrRowIndex];
-		requredArr = res[requredArrRowIndex];
-		
-		columns = [];
-		
-		for(var _indx = 0, len = columnArr.length; _indx < len; _indx++){
-			
-			var col = columnArr[_indx];
-			
-			if(col.trim() == '') continue;
-			
-			columns.push(WDCT_Timeline.getColumnDefination(_indx, _indx, col, dataTypeArr[_indx], requredArr[_indx], contextArr[_indx]));
-		}
-		
-		//console.log('columns length --prep--' + columns.length);
-		
-		global_wb = null;
-		wb = null;
-		
-		WDCT_Timeline.processData();
-	  }, 500);	
-		
-		
-	},
+			global_wb = null;
+			wb = null;
+			WDCT_Timeline.processData();
+	  });
+  },
+  
+  process_wb: function(wb) {
+	  res = to_multiArray(wb, current_sheet);
+	  setTimeout(WDCT_Timeline.process_wb_callback(wb, current_sheet), 500);
+  },
 	
-  
-  
+  processData_callback: function(lastChunk, _resLen){
+	  return (function(){
+	    	loader.showMore(processing_continue_msg.replace(lastChunkMergeText, lastChunk).replace(_resLenMergeText, _resLen));
+	    	data_iteration++;	
+			WDCT_Timeline.processData();
+	    });
+  },
+  processData_callback1: function(){
+	return (function(){
+		WDCT_Timeline.endProcess();
+	});  
+  },
   processData : function(){
-	  //data = [];
 	  var lastChunk = data_iteration * data_chunk;	
 		for(var _indx = data_startindex, _indxLen = res.length; _indx < _indxLen && _indx < lastChunk; _indx++){
 			var obj  = {};
-			
 			var row = res[_indx];
 			var objErr = {};
-			
 			var isValidRow = false;
-			
 			for(_jindx = 0, _jindxLen = row.length; _jindx < _jindxLen; _jindx++){
 				var val = row[_jindx];
 				if(val.trim() != '') isValidRow = true;
 				obj[_jindx] = row[_jindx];
 				objErr[_jindx] = false;
 				objErr[_jindx] = WDCT_Timeline.hasError(obj, _jindx, row[_jindx]);
-				
 			}
-			
-			obj['id'] = _indx;
+			// define id for an row as it is mandatory to have id column
+			obj[id_tag] = _indx;
 			
 			if(isValidRow){
 			  dataErr.push(objErr);	
@@ -184,43 +170,21 @@ var WDCT_Timeline = {
 			}
 			objErr = null;
 			obj = null;
-			
 			data_startindex = _indx;
-			//console.log(_indx);
 		}
 		data_startindex = _indx;
 		var _resLen = res.length - _start_index;
-		
 		if(lastChunk <= res.length){
-			
-			//loader.hide();
-		    setTimeout(function(){
-		    	loader.showMore('Processed ::' + lastChunk + ' out of ' + _resLen + ' records..');
-		    	data_iteration++;	
-				WDCT_Timeline.processData();
-		    }, 500);
-			
+		    setTimeout(WDCT_Timeline.processData_callback(lastChunk, _resLen), 500);
 		}else{
-			
-			loader.showMore('Preparing to load. Please wait..');
-			setTimeout(function(){
-				
-				WDCT_Timeline.endProcess();
-				
-			}, 500);
-			
+			loader.showMore(preparing_to_load_msg);
+			setTimeout(WDCT_Timeline.processData_callback1(), 500);
 		}
-		
-		
-	  
   },
   endProcess: function(){
-	  
 	    res = null;
 		loader.hide();
-		WDCT_Timeline.bindMetadata();
 		WDCT_Timeline.reFreshGrid();
-	  
   },
   reFreshGrid : function(){
 	    
@@ -229,13 +193,10 @@ var WDCT_Timeline = {
 	        grid = null;
 	    }
 	    
-	    //columns.push(default_columns);
-	    
-		
 		dataView = new Slick.Data.DataView({ inlineFilters: false });
 		//dataView.setPagingOptions({pageSize: 65000});
 		grid = new Slick.Grid(grid_clientId, dataView, columns, WDCT_Timeline.getGridOptions());
-	    //grid = new Slick.Grid(grid_clientId, data, columns, WDCT_Timeline.getGridOptions());
+	   
 		var pager = new Slick.Controls.Pager(dataView, grid, $(pager_clientId));
 		
 		
@@ -249,48 +210,11 @@ var WDCT_Timeline = {
 	      WDCT_Timeline.renderGrid();
 	    });
 		
-		
-	    
-	    /**
-	    $(grid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
-	        var columnId = $(this).data("columnId");
-	        if (columnId != null) {
-	          columnFilters[columnId] = $.trim($(this).val());
-	        
-	          dataView.refresh();
-	         
-	        }
-	      });
-	    
-	    
-	      grid.onHeaderRowCellRendered.subscribe(function(e, args) {
-	          $(args.node).empty();
-	          if(typeof args.column.id != UNDEFINED && args.column.id != 0){
-	            $("<input type='text'>")
-	             .data("columnId", args.column.id)
-	             .val(columnFilters[args.column.id])
-	             .appendTo(args.node);
-	           
-	          }
-	      });
-	    **/
 	     // set keyboard focus on the grid 
 	    grid.getCanvasNode().focus(); 
-	    
 	    //grid.registerPlugin( new Slick.AutoColumnSize());
-	    
-	    
-	    
-	    
-	    /**
-	    // add header menu plugin
-	    var headerMenuPlugin = new Slick.Plugins.HeaderMenu({});
-	    // bind on command event
-	    headerMenuPlugin.onCommand.subscribe(WDCT_Timeline.onHeaderMenuCommandHandler);
-	    // register the plugin
-	    grid.registerPlugin(headerMenuPlugin);
-       **/
 	    var headerButtonsPlugin = new Slick.Plugins.HeaderButtons();
+	    // subscribe an action to header buttons
 	    //headerButtonsPlugin.onCommand.subscribe(function(e, args) {
 	      //var column = args.column;
 	      //var button = args.button;
@@ -298,168 +222,119 @@ var WDCT_Timeline = {
 	      
 	    //});
 	    grid.registerPlugin(headerButtonsPlugin);
-	    
-	    
 	    grid.onHeaderClick.subscribe(function(e, args) {
 	        var columnID = args.column.id;
-	        //console.log(columnID);
 	        grid.gotoCell(0, columnID);
 	        WDCT_Timeline.selectColumnRange(columnID);
 	    });
-	    
-	   
-	    
-	    
 	    grid.setSelectionModel(new Slick.CellSelectionModel());
 	    
-	    
 	    /** COPY MANAGER PLUGIN **/
-	    
 	    var copyManager = new Slick.CellExternalCopyManager();
 	    grid.registerPlugin(copyManager);
 	    copyManager.onPasteCells.subscribe(WDCT_Timeline.onPasteCellsHandler);
-	     
-
-	    /***  ROW - REORDERING ***/
-	    //var moveRowsPlugin = new Slick.RowMoveManager();
-	    //moveRowsPlugin.onBeforeMoveRows.subscribe(Timeline.onBeforeMoveRowsHandler);
-	    //moveRowsPlugin.onMoveRows.subscribe(Timeline.onMoveRowsHandler);
-	    //grid.registerPlugin(moveRowsPlugin);
-
-	    
+	    	    
 	    /*** AUTO - TOOLTIP **/
 	    grid.registerPlugin(new Slick.AutoTooltips());
 	    
-	    
-	    // bind cell change event
-	    //grid.onCellChange.subscribe(WDCT_Timeline.onCellChangeHandler);
-	   
-	    
-	    grid.onCellChange.subscribe(function (e, args) {
-	        dataView.updateItem(args.item.id, args.item);
-	      });
-	    
-	    //grid.onActiveCellChanged.subscribe(WDCT_Timeline.onCellChangeHandler);
-	    // bind addnew row event
-	    //grid.onAddNewRow.subscribe(Timeline.onAddNewRowHandler);
-	    
-	    // bind edit cell event
-	    //grid.onBeforeEditCell.subscribe(WDCT_Timeline.onBeforeEditCellHandler);
-	    
-	    
+	    grid.onCellChange.subscribe(WDCT_Timeline.onCellChangeHandler);
 	    // bind context menu
 	    grid.onContextMenu.subscribe(WDCT_Timeline.onContextMenuHandler);
-	    
-	    $(grid_clientId).on('blur', function() {
-	        Slick.GlobalEditorLock.commitCurrentEdit();
-	    });
-	    
-	    
-	    function filter(item) {
-            var columns = grid.getColumns();
-
-            var value = true;
-
-            for (var i = 0, colLen = columns.length; i < colLen; i++) {
-                var col = columns[i];
-                var filterValues = col.filterValues;
-                var dup = col.findDup;
-                var dt = col.findDt;
-                var iv = col.findIv;
-
-                if (filterValues && filterValues.length > 0) {
-                    value = value & _.contains(filterValues, item[col.field]);
-                }
-                
-                if(dup){
-                	// get duplicate code here
-                	//console.log(col.dupData);
-                	var val = item[col.field];
-                	if(typeof col.dupData != 'undefined' && col.dupData[val] == 1){
-                		value = false;
-                	}
-                }
-                
-                if(dt){
-                	value = WDCT_Timeline.hasDataTypeError(item, col.field, item[col.field]);
-                }
-                
-                if(iv){
-                	value = WDCT_Timeline.hasValidValuesError(item, col.field, item[col.field]);
-                }
-            }
-            return value;
-            
-            
-        }
-	    
 	    
 	 // initialize the model after all the events have been hooked up
 	    dataView.beginUpdate();
 	    dataView.setItems(data);
-	    //dataView.setFilter(WDCT_Timeline.filter);
-	    dataView.setFilter(filter);
+	    dataView.setFilter(WDCT_Timeline.filter);
 	    dataView.endUpdate();
 	    
-	    
-	    
-	    
 	    var filterPlugin = new Ext.Plugins.HeaderFilter({});
-
-        filterPlugin.onFilterApplied.subscribe(function () {
-            dataView.refresh();
-            grid.resetActiveCell();  
-            WDCT_Timeline.renderGrid();
-        });
-
-        filterPlugin.onCommand.subscribe(function (e, args) {
-            var comparer = function (a, b) {
-                return a[args.column.field] > b[args.column.field];
-            };
-
-            switch (args.command) {
-                case "sort-asc":
-                    dataView.sort(comparer, true);
-                    break;
-                case "sort-desc":
-                    dataView.sort(comparer, false);
-                    break;
-            }
-        });
-
+        filterPlugin.onFilterApplied.subscribe(WDCT_Timeline.onFilterAppliedHandler);
+        filterPlugin.onCommand.subscribe(WDCT_Timeline.filteronCommandHandler);
         grid.registerPlugin(filterPlugin);
 
         var overlayPlugin = new Ext.Plugins.Overlays({ decoratorWidth: 1});
-
-        overlayPlugin.onFillUpDown.subscribe(function (e, args) {
-            var column = grid.getColumns()[args.range.fromCell];
-
-            if (!column.editor) {
-                return;
-            }
-
-            var value = dataView.getItem(args.range.fromRow)[column.field];
-
-            dataView.beginUpdate();
-
-            for (var i = args.range.fromRow + 1; i <= args.range.toRow; i++) {
-                dataView.getItem(i)[column.field] = value;
-                grid.invalidateRow(i);
-            }
-
-            dataView.endUpdate();
-            grid.render();
-        });
-
+        overlayPlugin.onFillUpDown.subscribe(WDCT_Timeline.overlayonFillUpDownHandler);
         grid.registerPlugin(overlayPlugin); 
 	    
 	    
-	    
-	    //grid.init();
 	    WDCT_Timeline.renderGrid();
 	    
   },
+  overlayonFillUpDownHandler: function (e, args) {
+      var column = grid.getColumns()[args.range.fromCell];
+
+      if (!column.editor) {
+          return;
+      }
+
+      var value = dataView.getItem(args.range.fromRow)[column.field];
+
+      dataView.beginUpdate();
+
+      for (var i = args.range.fromRow + 1; i <= args.range.toRow; i++) {
+          dataView.getItem(i)[column.field] = value;
+          grid.invalidateRow(i);
+      }
+
+      dataView.endUpdate();
+      grid.render();
+  },
   
+  filteronCommandHandler: function (e, args) {
+      var comparer = function (a, b) {
+          return a[args.column.field] > b[args.column.field];
+      };
+
+      switch (args.command) {
+          case "sort-asc":
+              dataView.sort(comparer, true);
+              break;
+          case "sort-desc":
+              dataView.sort(comparer, false);
+              break;
+      }
+  },
+  onFilterAppliedHandler: function () {
+      dataView.refresh();
+      grid.resetActiveCell();  
+      WDCT_Timeline.renderGrid();
+  },
+  
+  filter: function (item) {
+      var columns = grid.getColumns();
+
+      var value = true;
+
+      for (var i = 0, colLen = columns.length; i < colLen; i++) {
+          var col = columns[i];
+          var filterValues = col.filterValues;
+          var dup = col.findDup;
+          var dt = col.findDt;
+          var iv = col.findIv;
+
+          if (filterValues && filterValues.length > 0) {
+              value = value & _.contains(filterValues, item[col.field]);
+          }
+          
+          if(dup){
+          	// get duplicate code here
+          	var val = item[col.field];
+          	if(typeof col.dupData != UNDEFINED && col.dupData[val] == 1){
+          		value = false;
+          	}
+          }
+          
+          if(dt){
+          	value = WDCT_Timeline.hasDataTypeError(item, col.field, item[col.field]);
+          }
+          
+          if(iv){
+          	value = WDCT_Timeline.hasValidValuesError(item, col.field, item[col.field]);
+          }
+      }
+      return value;
+      
+  },
   onBeforeEditCellHandler: function(e, args) {
       // make row un-editable [rows such as weekname, total]
 	 var data = grid.getData();
@@ -492,88 +367,41 @@ var WDCT_Timeline = {
 	  WDCT_Timeline.resizeGrid();
   },
   
-  handleDrop: function(e) {
-		e.stopPropagation();
-		e.preventDefault();
-		loader.show();
-		
-		setTimeout(function(){
-			var files = e.dataTransfer.files;
-			var f = files[0];
-			{
-				var reader = new FileReader();
-				var name = f.name;
-				reader.onload = function(e) {
-					//if(typeof console !== UNDEFINED) console.log("onload", new Date(), rABS, use_worker);
-					var data = e.target.result;
-					//if(use_worker) {
-						//xw(data, process_wb);
-					//} else {
-						var wb;
-						if(rABS) {
-							wb = X.read(data, {type: 'binary'});
-						} else {
-							var arr = fixdata(data);
-							wb = X.read(btoa(arr), {type: 'base64'});
-						}
-						WDCT_Timeline.process_wb(wb);
-					//}
-				};
-				if(rABS) reader.readAsBinaryString(f);
-				else reader.readAsArrayBuffer(f);
-				loader.hide();
-			}
+  readerOnLoadHandler: function(e) {
+		var data = e.target.result;
+		var wb;
+		if(rABS) {
+			wb = X.read(data, {type: 'binary'});
 			
-		}, 1000);
-		
-		
-	},
-
-	handleDragover: function(e) {
-		e.stopPropagation();
-		e.preventDefault();
-		e.dataTransfer.dropEffect = 'copy';
-	},
-
-
-	handleFile: function(e) {
-		loader.show();
-		
-		setTimeout(function(){
+		} else {
+			var arr = fixdata(data);
+			wb = X.read(btoa(arr), {type: 'base64'});
+		}
+		WDCT_Timeline.process_wb(wb);
+		wb = null;
+		data = null;
+  },
+  
+  handleFile_Callback: function(e){
+	  return (function(){
 			var files = e.target.files;
 			var f = files[0];
 			{
 				var reader = new FileReader();
 				var name = f.name;
-				reader.onload = function(e) {
-					//if(typeof console !== UNDEFINED) console.log("onload", new Date(), rABS, use_worker);
-					var data = e.target.result;
-					//if(use_worker) {
-						//xw(data, process_wb);
-					//} else {
-						var wb;
-						if(rABS) {
-							//console.log('binary');
-							wb = X.read(data, {type: 'binary'});
-							
-						} else {
-							//console.log('base64');
-							var arr = fixdata(data);
-							wb = X.read(btoa(arr), {type: 'base64'});
-						}
-						
-						WDCT_Timeline.process_wb(wb);
-					//}
-				};
+				reader.onload = WDCT_Timeline.readerOnLoadHandler;
 				
 				if(rABS) reader.readAsBinaryString(f);
 				else reader.readAsArrayBuffer(f);
 				
-				//loader.hide();
 			}
 			
-		}, 1000);
-		
+		});
+  },
+  
+  handleFile: function(e) {
+		loader.show();
+		setTimeout(WDCT_Timeline.handleFile_Callback(e), 1000);
   },
   
   
@@ -585,7 +413,6 @@ var WDCT_Timeline = {
       $(contextmenu_clientId).hide();
       
       
-      //console.log(cell);
       $(contextmenu_clientId)
           .data("data", { range : grid.getSelectionModel().getSelectedRanges(), row : cell.row, cell : cell.cell})
           .css("top", e.pageY)
@@ -673,35 +500,7 @@ var WDCT_Timeline = {
                                       
                                   grid.invalidateRow(from.fromRow + i);
                             	  
-                            	  /**
-                                      var rowId = data[from.fromRow + i].id;
-                                      var field = columns[from.fromCell + j].field;
-                                      var value = data[from.fromRow + i][columns[from.fromCell + j].field];
-                                      var replaceValue = '';
-                                      
-                                      if (val.toLowerCase() == 'clear') {
-                                    	  replaceValue = '';
-	                                  }else if (val.toLowerCase() == 'prefix') {
-	                                         var prefix_value = $('#prefix_input').val();
-	                                         if(typeof prefix_value != UNDEFINED && prefix_value.trim() == ''){
-	                                        	 alert('No value defined for prefix!!!');
-	                                        	 return;
-	                                         }
-	                                         replaceValue = prefix_value + value;
-	                                  }else if (val.toLowerCase() == 'fill') {
-	                                         var fill_value = $('#fill_input').val();
-	                                         if(typeof fill_value != UNDEFINED && fill_value.trim() == ''){
-	                                        	 alert('No value defined to fill!!!');
-	                                        	 return;
-	                                         }
-	                                         replaceValue = fill_value;
-	                                  }
-                                      
-                                      
-                                      data[from.fromRow + i][columns[from.fromCell + j].field] = replaceValue;
-                                          
-                                      grid.invalidateRow(from.fromRow + i);
-                                 **/
+                            	  
                               }
                  
                           } 
@@ -720,21 +519,9 @@ var WDCT_Timeline = {
         
     },
   
-  onHeaderMenuCommandHandler: function(e, args) {
-	  
-      if (args.command === 'select_rows') {
-          //Timeline.addMoreColumnsOnRight(args.column.id, 1);
-    	  //alert('select rows called');
-    	  WDCT_Timeline.selectColumnRange(args.column.id);
-      }
-
-  },
-  
   
   onCellChangeHandler: function(e, args){
-	  //WDCT_Timeline.onBeforeEditCellHandler(e, args);
-	  //WDCT_Timeline.setAndDisplayErrorCount();
-	  
+	  dataView.updateItem(args.item.id, args.item);
   },
   
   hasDataTypeError: function(rowObj, cell, value){
@@ -797,7 +584,7 @@ var WDCT_Timeline = {
 		        	try{
 		        	  var base_date = new Date(value); 
 		        	  var compare_date = new Date(lookupCellValue);
-		        	  if(base_date < compare_date) isInvalid = true;
+		        	  if(base_date <= compare_date) isInvalid = true;
 		        	}catch(ex) {
 		        		isInvalid = true;
 		        	}
@@ -827,9 +614,6 @@ var WDCT_Timeline = {
   
   hasError: function(rowObj, cell, value){
   	var isInvalid = false;
-  	
-  	//console.log(columnArr[cell].trim().toUpperCase());
-  	//console.log(WDCT_HEADER_REGEX[columnArr[cell].trim().toUpperCase()]);
   	
   	
   	isInvalid = WDCT_Timeline.hasDataTypeError(rowObj, cell, value);
@@ -898,7 +682,7 @@ var WDCT_Timeline = {
         	    },
          headerCssClass: ""
          ,formatter: WDCT_Timeline.validateFormatter
-         ,asyncPostRender: WDCT_Timeline.asyncPostRenderHandler
+         
      }
 	 
 	 if(typeof requiredText != UNDEFINED && requiredText.toLowerCase() == 'required'){
@@ -911,12 +695,7 @@ var WDCT_Timeline = {
          image: "../resources/WDCT_SlickGrid/images/help.png",
          showOnHover: false,
          tooltip: contextText,
-         handler: function(e) {
-           //alert('Help');
-       	  //for(var _a in e){
-       		//  console.log(_a);
-       	  //}
-         }
+         handler: function(e) {}
        });
 	 
 	 column.header.buttons.push({
@@ -927,7 +706,6 @@ var WDCT_Timeline = {
 		
 
   resizeGrid: function(){
-      //$(grid_clientId).css({'width': '100%', height: ($(window).outerHeight() - ($('#input_section').outerHeight() + $('.slick-pager').outerHeight() + 35))});
 	  $(grid_clientId).css({'width': '100%', height: ($(window).outerHeight() - ($('#input_section').outerHeight() + $('.slick-pager').outerHeight() + 32))});
       if(typeof grid != UNDEFINED) grid.resizeCanvas();
   },
@@ -943,16 +721,14 @@ var WDCT_Timeline = {
           enableColumnReorder: false
           ,forceFitColumns : false
           ,headerRowHeight : 30
-          ,enableAsyncPostRender: true
+          ,enableAsyncPostRender: false
           ,asyncPostRenderDelay : 20 // default 50
           //,leaveSpaceForNewRows : true
           //,frozenColumn : 4
           //,frozenRow : 3
-     
           //,autoHeight: true
           //,fullWidthRows: true
           //,frozenBottom: true
-          
           //,showHeaderRow: true
           //,editCommandHandler: undoRedoBuffer.queueAndExecuteCommand
       };  
@@ -964,37 +740,13 @@ var WDCT_Timeline = {
         //console.log('me render');
         WDCT_Timeline.setAndDisplayErrorCount();
     },
-    asyncPostRenderHandler: function(cellNode, row, dataContext, colDef) {
-    	/**
-    	var cell = colDef.id;
-    	var value = dataContext[cell];
-    	
-    	if(cell != 'id'){
-    	 
-    	  if(dataErr[row][cell]){
-    		  $(cellNode).addClass('frmt-invalid');
-      	  }else{
-      		$(cellNode).removeClass('frmt-invalid');
-      	  }
-    	}else{
-    		$(cellNode).removeClass('frmt-invalid');
-    	}
-    	**/
-    },
     validateFormatter: function(row, cell, value, columnDef, dataContext) {
     	
     	dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
     	if(dataErr[row][cell]){
     		return "<div class='frmt-invalid' style='width:100%;'>" + value + "</div>";
     	}
-    	/**
-    	var data = grid.getData();
-    	dataErr[row][cell] = WDCT_Timeline.hasError(data.getItem(row), cell, value);
-    	if(dataErr[row][cell]){
-    		return "<div class='frmt-invalid' style='width:100%;'>" + value + "</div>";
-    	}
-    	//WDCT_Timeline.setAndDisplayErrorCount();
-    	**/
+    	
     	return value;
     }, 
     
@@ -1037,37 +789,6 @@ var WDCT_Timeline = {
         dataView.endUpdate();
         
         WDCT_Timeline.renderGrid();
-    },
-    
-    bindMetadata: function(){
-    	
-    	/**
-        // set the grid's data as new rows
-    	dataView.getItemMetadata = function (row) {
-        	      var metadata;
-                  if(row < 3){
-	                    metadata =  {
-	                	  cssClasses:"slick-gray_background",
-	                      selectable: false,
-	                      focusable: false,
-	                      columns:{}
-	                    };
-	                   for(var _indx = 0; _indx < columns.length; _indx++){
-	                	   metadata.columns[_indx] = {
-	                			   editor:"",
-	                			   formatter: function(row, cell, value, columnDef, dataContext) {
-	                			        return value;
-	                			    }  
-	                	   };
-	                   }
-                  }
-                  
-                  
-                  
-                  
-                  return metadata; 
-        }
-        **/
     }, 
     // Method to convert b64 to blob for IE10+ export
     b64toBlob : function(b64Data, contentType, sliceSize) {
@@ -1115,33 +836,6 @@ var WDCT_Timeline = {
 	 return false;       
 	},
 	
-	filter: function(item) {
-	    for (var columnId in columnFilters) {
-	      if (columnId !== undefined && columnFilters[columnId] !== "") {
-	        var c = grid.getColumns()[grid.getColumnIndex(columnId)];
-
-	        //console.log(item);
-	        //console.log(columnFilters[columnId]);
-	        var input_value = columnFilters[columnId];
-
-	         if(input_value == 'Data_Type_Error'){
-	           return WDCT_Timeline.hasDataTypeError(item, c.field, item[c.field]);
-	         }
-
-	         if(input_value == 'Invalid_Values_Error'){
-	          return WDCT_Timeline.hasValidValuesError(item, c.field, item[c.field]);
-	         }
-
-	         if (item[c.field] != input_value) {
-	          return false;
-	         }
-	        
-	        
-	      }
-	    }
-	    return true;
-	},
-	
 	exportMyXLSX : function(excel_data){
 		var data = excel_data;	
 		var lastChunk = xlsx_iteration * xlsx_chunk;
@@ -1153,8 +847,7 @@ var WDCT_Timeline = {
 		  		  for(var jindx in row){
 		  			  try{
 		  				  
-		  			    //console.log(jindx);
-		  			    if(jindx != 'id'){
+		  			    if(jindx != id_tag){
 		  			    	rowArray.push(WDCT_Timeline.escapeCell(row[jindx]));
 		  			    }
 		  			  }catch(ex){console.log(ex);}
@@ -1190,75 +883,7 @@ var WDCT_Timeline = {
 				
 			}
 		
-		/**
-		var data = excel_data;	
-		var lastChunk = xlsx_iteration * xlsx_chunk;
 		
-			for(var R = xlsx_s_index; R <= data.getLength() && R <= lastChunk; R++){
-				  //console.log('R:::' + R);
-		  		  var row = data.getItem(R - 1);
-		  		  
-		  		  for(var jindx in row){
-		  			  try{
-		  				  
-		  			    //console.log(jindx);
-		  			    if(jindx != 'id'){
-			  				var C = parseInt(jindx);
-			  				//console.log('C:::' + C);
-			  				if(xlsx_range.s.r > R) xlsx_range.s.r = R;
-							if(xlsx_range.s.c > C) xlsx_range.s.c = C;
-							if(xlsx_range.e.r < R) xlsx_range.e.r = R;
-							if(xlsx_range.e.c < C) xlsx_range.e.c = C; 
-			  				
-							var cell = {v: row[jindx] };
-							
-							if(cell.v != null){ 
-								var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
-								
-								if(typeof cell.v === 'number') cell.t = 'n';
-								else if(typeof cell.v === 'boolean') cell.t = 'b';
-								else if(cell.v instanceof Date) {
-									cell.t = 'n'; cell.z = XLSX.SSF._table[14];
-									cell.v = WDCT_Timeline.datenum(cell.v);
-								}
-								else cell.t = 's';
-								
-								xlsx_ws[cell_ref] = cell;
-							}
-							
-		  			    }
-		  			  }catch(ex){console.log(ex);}
-		  		  }
-		  		  
-		  		  
-		  		xlsx_s_index = R;
-		  		  
-		  	}
-			
-			
-			if(lastChunk <= data.getLength()){
-				
-				//loader.hide();
-			    setTimeout(function(){
-			    	loader.showMore('Processed ::' + lastChunk + ' out of ' + excel_data.getLength() + ' records..');
-			    	xlsx_iteration++;
-			    	WDCT_Timeline.exportMyXLSX(excel_data);
-			    }, 500);
-				
-			}else{
-				
-				loader.showMore('Preparing to download. Please wait..');
-				setTimeout(function(){
-					
-					if(xlsx_range.s.c < 10000000) xlsx_ws['!ref'] = XLSX.utils.encode_range(xlsx_range);
-					
-					WDCT_Timeline.writeMyXLSX();
-					loader.hide();
-					
-				}, 500);
-				
-			}
-		**/
 	},
 	
 	writeHeaders: function() {
@@ -1277,34 +902,7 @@ var WDCT_Timeline = {
 		//console.log(rowStr);
 		xlsx_ws.push(rowStr);
 		
-		/**
-		for(var _indx = 0; _indx < columnArr.length; _indx++){
-			var R = 0;
-			var C = _indx;
-			if(xlsx_range.s.r > R) xlsx_range.s.r = R;
-			if(xlsx_range.s.c > C) xlsx_range.s.c = C;
-			if(xlsx_range.e.r < R) xlsx_range.e.r = R;
-			if(xlsx_range.e.c < C) xlsx_range.e.c = C; 
-				
-			var cell = {v: columnArr[_indx] };
-			
-			if(cell.v == null){ 
-				continue;
-			}
-			var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
-			
-			if(typeof cell.v === 'number') cell.t = 'n';
-			else if(typeof cell.v === 'boolean') cell.t = 'b';
-			else if(cell.v instanceof Date) {
-				cell.t = 'n'; cell.z = XLSX.SSF._table[14];
-				cell.v = WDCT_Timeline.datenum(cell.v);
-			}
-			else cell.t = 's';
-			
-			xlsx_ws[cell_ref] = cell;
-			
-		}
-		**/
+		
 		
 	},
 
@@ -1312,31 +910,16 @@ var WDCT_Timeline = {
 		/* original data */
 		var ws_name = current_sheet;
 		
-		//function Workbook() {
-			//if(!(this instanceof Workbook)) return new Workbook();
-			//this.SheetNames = [];
-			//this.Sheets = {};
-		//}
-		
-		//var wb = new Workbook();
-		 
-		/* add worksheet to workbook */
-		//wb.SheetNames.push(ws_name);
-		//wb.Sheets[ws_name] = xlsx_ws;
-		
 		try{
-		  //original//var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
 		  var wbout = xlsx_ws.join('\r\n');	
-		  ///[\r\n]/
 		
 		}catch(ex){
-			alert('write::' + ex);
+			alert('write error::' + ex);
 		}
 		
 		try{
-			//saveAs(new Blob([WDCT_Timeline.s2ab(wbout)],{type:"application/octet-stream"}), current_sheet +".xlsx");
 			saveAs(new Blob([WDCT_Timeline.s2ab(wbout)],{type:"application/octet-stream"}), current_sheet +".csv");
-		}catch(ex){alert('saveAs::' + ex);}
+		}catch(ex){alert('saveAs error::' + ex);}
 	},
 	
 	
@@ -1344,13 +927,6 @@ var WDCT_Timeline = {
 		var qreg = /"/g;
 		var val = cell || '';
 		val = val.toString();
-		/**
-		  cell = cell || '';
-		  cell = cell.toString();
-		  return (cell.indexOf(',') !== -1 || cell.indexOf('"') !== -1 || cell.indexOf('\n') !== -1) ?
-				  "\"" + cell.replace(qreg, '""') + "\"" :
-		    cell;
-		**/		  
 				  
 		  var FS = ",", fs = FS.charCodeAt(0);
 		  var RS = "\n", rs = RS.charCodeAt(0);
