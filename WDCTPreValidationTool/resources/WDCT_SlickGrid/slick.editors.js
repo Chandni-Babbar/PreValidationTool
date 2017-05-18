@@ -28,26 +28,21 @@
 	    var $select;
 	    var defaultValue;
 	    var scope = this;
-        //console.log(args.column.field);
 	    this.init = function () {
 	      $select = $("<SELECT tabIndex='0' class='editor-yesno'></SELECT>");
 	      if(typeof args.column.field != 'undefined' &&
 	 			 typeof lookup_sheets_data != 'undefined' &&
 	 			 typeof lookup_sheets_data[args.column.field] != 'undefined' ){
-	 		 //for(var _a in lookup_sheets_data[args.column.field]){
-	 			//$select.append($("<OPTION value='" + _a + "'>" + _a + "</OPTION>"));
-	 		 //}
-	    	  
-	    	 //get the array 
-	    	  var arr = [];
-	    	  for(var _a in lookup_sheets_data[args.column.field]){
-		 			arr.push(_a);
-		 	  } 
-	    	  arr.sort();
-	    	  
-	    	  for(var _indx = 0; _indx < arr.length; _indx++){
-	    		  $select.append($("<OPTION value='" + arr[_indx] + "'>" + arr[_indx] + "</OPTION>"));
-	    	  }
+		 		 //get the array 
+		    	  var arr = [];
+	    		  var sheetData = lookup_sheets_data[args.column.field];
+		    	  for(var _a in sheetData){
+			 			arr.push(_a);
+			 	  } 
+		    	  arr.sort();
+		    	  for(var _indx = 0, _indxLen = arr.length; _indx < _indxLen; _indx++){
+		    		  $select.append($("<OPTION value='" + arr[_indx] + "'>" + arr[_indx] + "</OPTION>"));
+		    	  }
 	    	  
 	 	  }
 	     
@@ -55,7 +50,8 @@
 	      $select.focus();
 	      
 	      $select.click(function(e){
-	    	  e.stopPropagation();
+	    	  e.stopImmediatePropagation();
+	    	  //e.stopPropagation();
 	      });
 	    };
 
