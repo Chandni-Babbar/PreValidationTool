@@ -54,6 +54,14 @@ $(function() {
 });
 
 
+var A_DATESHOULDLESSTHAN_B = function(a, b){
+	return (new Date(a) < new Date(b));
+}
+
+var A_DATESHOULDGREATERTHAN_B = function(a, b){
+	return (new Date(a) > new Date(b));
+}
+
 var WDCT_Timeline = {
   errorsCount : 0,
   
@@ -159,7 +167,7 @@ var WDCT_Timeline = {
 				if(val.trim() != '') isValidRow = true;
 				obj[_jindx] = row[_jindx];
 				objErr[_jindx] = false;
-				objErr[_jindx] = WDCT_Timeline.hasError(obj, _jindx, row[_jindx]);
+				//objErr[_jindx] = WDCT_Timeline.hasError(obj, _jindx, row[_jindx]);
 			}
 			// define id for an row as it is mandatory to have id column
 			obj[id_tag] = _indx;
@@ -306,6 +314,45 @@ var WDCT_Timeline = {
       var value = true;
 
       for (var i = 0, colLen = columns.length; i < colLen; i++) {
+          var columnDef = columns[i];
+          if(typeof WDCT_Validator.columns != 'undefined' && 
+          		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&
+          		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != 'undefined'){
+	          	for(var _a in WDCT_Validator.columns[columnDef.id]["VALIDATIONS"]){
+	          		var applyValidation = columnDef[_a] || false;
+	          		if(applyValidation){
+	          			//what type of validation
+	          			var type = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["TYPE"];
+	          			var val = item[columnDef.field];
+	          			var lookupCell = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["LOOKUPINDEX"];
+	          			var lookupCellValue = '';
+	          			
+	          			if(typeof lookupCell != 'undefined'){
+	          				lookupCellValue = item[lookupCell];
+	          			}
+	          			
+	          			
+	          			if(type == 'DUPLICATE'){
+	          			// if it is DUPLICATE TYPE
+	          	          	if(typeof columnDef['dupData'] != UNDEFINED && columnDef['dupData'][val] == 1){
+	          	          		value = value && false;
+	          	          	}
+	          			}else if(type == 'REGEX'){
+	          			// if it is REGEX TYPE
+	          				var reg_pattern = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["VALIDATIONRULE"];
+	          				value = value && !reg_pattern.test(val.trim());
+	          				//console.log(reg_pattern.test(val.trim()));
+	          			}else if(type == 'JSFUNCTION'){
+	          				var func = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["VALIDATIONRULE"];
+	          				value = value && !window[func](val, lookupCellValue);
+	          			}
+	          		}
+	          	}
+          }
+      }
+      
+      /**
+      for (var i = 0, colLen = columns.length; i < colLen; i++) {
           var col = columns[i];
           var filterValues = col.filterValues;
           var dup = col.findDup;
@@ -332,6 +379,7 @@ var WDCT_Timeline = {
           	value = WDCT_Timeline.hasValidValuesError(item, col.field, item[col.field]);
           }
       }
+      **/
       return value;
       
   },
@@ -526,7 +574,7 @@ var WDCT_Timeline = {
   
   hasDataTypeError: function(rowObj, cell, value){
       var isInvalid = false;
-
+/**
       if(typeof dataTypeArr[cell] != UNDEFINED && dataTypeArr[cell].trim() != '' &&
           typeof WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()] != UNDEFINED && 
           WDCT_REGEX[dataTypeArr[cell].trim().toUpperCase()] != '' &&
@@ -534,7 +582,7 @@ var WDCT_Timeline = {
         
         isInvalid = true;
       }
-      
+**/      
       return isInvalid;
   },
 
@@ -742,7 +790,7 @@ var WDCT_Timeline = {
     },
     validateFormatter: function(row, cell, value, columnDef, dataContext) {
     	
-    	dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
+    	//dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
     	if(dataErr[row][cell]){
     		return "<div class='frmt-invalid' style='width:100%;'>" + value + "</div>";
     	}

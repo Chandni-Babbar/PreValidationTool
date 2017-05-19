@@ -135,15 +135,21 @@
             });
         }
 
+        //function cli()
+        
+        
         function showFilter(e) {
             var $menuButton = $(this);
             var columnDef = $menuButton.data("column");
 
             columnDef.filterValues = columnDef.filterValues || [];
-            columnDef.findDup = columnDef.findDup || false;
-            columnDef.findDt = columnDef.findDt || false;
-            columnDef.findIv = columnDef.findIv || false;
-            columnDef.dupData = columnDef.dupData || {};
+            
+            
+            
+            //columnDef.findDup = columnDef.findDup || false;
+            //columnDef.findDt = columnDef.findDt || false;
+            //columnDef.findIv = columnDef.findIv || false;
+            //columnDef.dupData = columnDef.dupData || {};
             
             // WorkingFilters is a copy of the filters to enable apply/cancel behaviour
             var workingFilters = columnDef.filterValues.slice(0);
@@ -170,15 +176,38 @@
             //addMenuItem($menu, columnDef, 'Sort Ascending', 'sort-asc', options.sortAscImage);
             //addMenuItem($menu, columnDef, 'Sort Descending', 'sort-desc', options.sortDescImage);
             
+            if(typeof WDCT_Validator.columns != 'undefined' && 
+            		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&
+            		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != 'undefined'){
+            	for(var _a in WDCT_Validator.columns[columnDef.id]["VALIDATIONS"]){
+            		columnDef[_a] = columnDef[_a] || false;
+            		
+            		
+            		
+            		if(WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["TYPE"] == 'DUPLICATE'){
+            			columnDef['dupData'] = columnDef['dupData'] || {};
+            		}
+            		
+            		
+            		var label = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["MENUITEMLABEL"];
+            		
+            		addMenuCheckbox($menu, columnDef, label, _a, columnDef[_a]);
+            		
+            		$('.' + _a + ':checkbox', $menu).bind('click', function () {
+                    	columnDef[$(this).attr('class')] = $(this).attr('checked') || false; 
+                    });
+            		
+            	}
+            }
             
             
-            addMenuCheckbox($menu, columnDef, 'Filter Duplicate Values', 'find-dup', columnDef.findDup);
-            addMenuCheckbox($menu, columnDef, 'Filter Data Type Errors', 'find-dt', columnDef.findDt);
-            addMenuCheckbox($menu, columnDef, 'Filter Invalid Values', 'find-iv', columnDef.findIv);
+            //addMenuCheckbox($menu, columnDef, 'Filter Duplicate Values', 'find-dup', columnDef.findDup);
+            //addMenuCheckbox($menu, columnDef, 'Filter Data Type Errors', 'find-dt', columnDef.findDt);
+            //addMenuCheckbox($menu, columnDef, 'Filter Invalid Values', 'find-iv', columnDef.findIv);
             
             
             //addMenuInput($menu, columnDef);
-
+/**
             
             $('.find-dup:checkbox', $menu).bind('click', function () {
             	columnDef.findDup = $(this).attr('checked') || false; 
@@ -189,7 +218,7 @@
             $('.find-iv:checkbox', $menu).bind('click', function () {
             	columnDef.findIv = $(this).attr('checked') || false; 
             });
-            
+**/            
             
             /**
             var filterOptions = "<label><input type='checkbox' value='-1' />(Select All)</label>";
@@ -211,25 +240,42 @@
                 .bind('click', function (ev) {
                     columnDef.filterValues = workingFilters.splice(0);
                     
-                    if(columnDef.findDup){
-                    	delete columnDef.dupData;
-                    	columnDef.dupData = {};
-	                    
-	                    var data = grid.getData();
-	                    for (var i = 0, len = data.getLength(); i < len ; i++) {
-	                        var value = data.getItem(i)[columnDef.field];
-	                        
-	                        if (typeof columnDef.dupData[value] == 'undefined') {
-	                            columnDef.dupData[value] = 1;
-	                        }else{
-	                        	columnDef.dupData[value] = columnDef.dupData[value] + 1;
-	                        }
-	                        
-	                    }
-	                   
+                    var isSelected = false;
+                    if(typeof WDCT_Validator.columns != 'undefined' && 
+                    		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&
+                    		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != 'undefined'){
+                    	for(var _a in WDCT_Validator.columns[columnDef.id]["VALIDATIONS"]){
+                    		
+                    		if(isSelected == false) isSelected = columnDef[_a];
+                    		
+                    		if(columnDef[_a] && 
+                    				WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["TYPE"] == 'DUPLICATE'){
+                    			//columnDef['dupData'] = columnDef['dupData'] || {};
+                    			delete columnDef['dupData'];
+                    			columnDef['dupData'] = {};
+        	                    
+        	                    var dataArr = dataView.getItems();
+        	                    for (var i = 0, len = dataArr.length; i < len ; i++) {
+        	                        var value = dataArr[i][columnDef.field];
+        	                        
+        	                        if (typeof columnDef['dupData'][value] == 'undefined') {
+        	                        	columnDef['dupData'][value] = 1;
+        	                        }else{
+        	                        	columnDef['dupData'][value] = columnDef['dupData'][value] + 1;
+        	                        }
+        	                        
+        	                    }
+        	                    
+        	                    console.log(columnDef['dupData']);
+                    		}
+                    	}
+                    }
+                    setButtonImage($menuButton, columnDef.filterValues.length > 0 || isSelected);
+                    
+                    if(isSelected){
+                    	WDCT_Validator.validatingColumn = columnDef.id;
                     }
                     
-                    setButtonImage($menuButton, columnDef.filterValues.length > 0 || columnDef.findDup || columnDef.findDt || columnDef.findIv);
                     handleApply(ev, columnDef);
                 });
 
@@ -237,12 +283,19 @@
                 .appendTo($menu)
                 .bind('click', function (ev) {
                     columnDef.filterValues.length = 0;
-                    columnDef.findDup = false;
-                    columnDef.findDt = false;
-                    columnDef.findIv = false;
-                    delete columnDef.dupData;
-                	columnDef.dupData = {};
-                	
+                    
+                    if(typeof WDCT_Validator.columns != 'undefined' && 
+                    		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&
+                    		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != 'undefined'){
+                    	for(var _a in WDCT_Validator.columns[columnDef.id]["VALIDATIONS"]){
+                    		columnDef[_a] = false;
+                    	}
+                    }
+                    if(typeof columnDef['dupData'] != 'undefined'){
+                    	delete columnDef['dupData'];
+                    	columnDef['dupData'] = {};
+                    }
+                    WDCT_Validator.validatingColumn = 0;
                     setButtonImage($menuButton, false);
                     handleApply(ev, columnDef);
                 });

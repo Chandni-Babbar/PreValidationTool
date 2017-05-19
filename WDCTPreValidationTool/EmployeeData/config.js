@@ -1,3 +1,188 @@
+var WDCT_Validator = {
+   validatingColumn: "0",
+   columns: {
+	   "1" : {
+		      "VALIDATIONS" : {
+		    	              "find-blank" :{
+		    	            	      "TYPE" : "REGEX"
+		    	            	      ,"VALIDATIONRULE" : /^\s*$/
+			    	                  ,"MSG" : "Value cannot be blank"
+			    	                  ,"MENUITEMLABEL" : "Find Blank Values"
+			    	                  ,"LOOKUPINDEX": ""	  
+		                           },
+		                       "find-dup" : {
+		                    	    
+		                    	          "TYPE" : "DUPLICATE"
+			    	            	      ,"VALIDATIONRULE" : /^\s*$/
+				    	                  ,"MSG" : "Value cannot be dublicate"
+				    	                  ,"MENUITEMLABEL" : "Find Duplicate Values"
+				    	                  ,"LOOKUPINDEX": ""
+		                           }    
+		      }
+		     
+	   },
+	   
+	   "4" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-blank" :{
+			            	      "TYPE" : "REGEX"
+			            	      ,"VALIDATIONRULE" : /^\s*$/
+				                  ,"MSG" : "Value cannot be blank"
+				                  ,"MENUITEMLABEL" : "Find Blank Values"
+				                  ,"LOOKUPINDEX": ""	  
+			                   },
+			                   "find-dates" :{
+				            	      "TYPE" : "REGEX"
+				            	      ,"VALIDATIONRULE" : /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/
+					                  ,"MSG" : "Value does not match mm/dd/yyyy format"
+					                  ,"MENUITEMLABEL" : "Find invalid dates format - mm/dd/yyyy"
+					                  ,"LOOKUPINDEX": ""	  
+				               },
+				              "find-date-compare" : {
+												   "TYPE" : "JSFUNCTION"
+												   ,"VALIDATIONRULE" : "A_DATESHOULDLESSTHAN_B"
+												   ,"MSG" : "Value cannot be after term date"
+						    	                   ,"MENUITEMLABEL" : "Find invalid dates > term date"
+						    	                   ,"LOOKUPINDEX": "252" 	   
+												}
+		                      }
+	   },
+	   
+	   "252" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-blank" :{
+			            	      "TYPE" : "REGEX"
+			            	      ,"VALIDATIONRULE" : /^$/
+				                  ,"MSG" : "Value cannot be blank"
+				                  ,"MENUITEMLABEL" : "Find Blank Values"
+				                  ,"LOOKUPINDEX": ""	  
+			                   },
+			                   "find-dates" :{
+				            	      "TYPE" : "REGEX"
+				            	      ,"VALIDATIONRULE" : /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/
+					                  ,"MSG" : "Value does not match mm/dd/yyyy format"
+					                  ,"MENUITEMLABEL" : "Find invalid dates format - mm/dd/yyyy"
+					                  ,"LOOKUPINDEX": ""	  
+				               },
+				              "find-date-compare" : {
+												   "TYPE" : "JSFUNCTION"
+												   ,"VALIDATIONRULE" : "A_DATESHOULDGREATERTHAN_B"
+												   ,"MSG" : "Value cannot be before hire date"
+						    	                   ,"MENUITEMLABEL" : "Find invalid dates < hire date"
+						    	                   ,"LOOKUPINDEX": "4" 	   
+												}
+		                      }
+	   },
+	   
+	   "255" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  
+			                   "find-dates" :{
+				            	      "TYPE" : "REGEX"
+				            	      ,"VALIDATIONRULE" : /(VOLUNTARY|INVOLUNTARY)$/i
+					                  ,"MSG" : "Value does not match"
+					                  ,"MENUITEMLABEL" : "Find invalid values"
+					                  ,"LOOKUPINDEX": ""	  
+				               }
+	           }
+	   },
+	   
+	   
+	   
+	   "259" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-blank" :{
+			            	      "TYPE" : "REGEX"
+			            	      ,"VALIDATIONRULE" : /^\s*$/
+				                  ,"MSG" : "Value cannot be blank"
+				                  ,"MENUITEMLABEL" : "Find Blank Values"
+				                  ,"LOOKUPINDEX": ""	  
+			                   },
+			                   "find-non-boolean" :{
+				            	      "TYPE" : "REGEX"
+				            	      ,"VALIDATIONRULE" : /(Y|N)$/i
+					                  ,"MSG" : "Value does not match format"
+					                  ,"MENUITEMLABEL" : "Find non Y/N values"
+					                  ,"LOOKUPINDEX": ""	  
+				               }
+		      }       
+	   },
+	   "262" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-blank" :{
+			            	      "TYPE" : "REGEX"
+			            	      ,"VALIDATIONRULE" : /^\s*$/
+				                  ,"MSG" : "Value cannot be blank"
+				                  ,"MENUITEMLABEL" : "Find Blank Values"
+				                  ,"LOOKUPINDEX": ""	  
+			                   },
+			                   "find-non-boolean" :{
+				            	      "TYPE" : "REGEX"
+				            	      ,"VALIDATIONRULE" : /(Y|N)$/i
+					                  ,"MSG" : "Value does not match format"
+					                  ,"MENUITEMLABEL" : "Find non Y/N values"
+					                  ,"LOOKUPINDEX": ""	  
+				               }
+		      }       
+	   },
+	   "263" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-blank" :{
+			            	      "TYPE" : "REGEX"
+			            	      ,"VALIDATIONRULE" : /^\s*$/
+				                  ,"MSG" : "Value cannot be blank"
+				                  ,"MENUITEMLABEL" : "Find Blank Values"
+				                  ,"LOOKUPINDEX": ""	  
+			                   },
+			                   "find-non-boolean" :{
+				            	      "TYPE" : "REGEX"
+				            	      ,"VALIDATIONRULE" : /(Y|N)$/i
+					                  ,"MSG" : "Value does not match format"
+					                  ,"MENUITEMLABEL" : "Find non Y/N values"
+					                  ,"LOOKUPINDEX": ""	  
+				               }
+		      }       
+	   },
+	   "266" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-blank" :{
+			            	      "TYPE" : "REGEX"
+			            	      ,"VALIDATIONRULE" : /^\s*$/
+				                  ,"MSG" : "Value cannot be blank"
+				                  ,"MENUITEMLABEL" : "Find Blank Values"
+				                  ,"LOOKUPINDEX": ""	  
+			                   },
+			                   "find-non-boolean" :{
+				            	      "TYPE" : "REGEX"
+				            	      ,"VALIDATIONRULE" : /(Y|N)$/i
+					                  ,"MSG" : "Value does not match format"
+					                  ,"MENUITEMLABEL" : "Find non Y/N values"
+					                  ,"LOOKUPINDEX": ""	  
+				               }
+		      }       
+	   }
+		
+   }	
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 var WDCT_REGEX = {
 		"MM/DD/YYYY" : /^((0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](19|20)?[0-9]{2})*$/
