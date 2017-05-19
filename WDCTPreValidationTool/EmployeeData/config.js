@@ -49,6 +49,40 @@ var WDCT_Validator = {
 		                      }
 	   },
 	   
+	   "33" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-unmatch" :{
+					               		"TYPE" : "MAP"
+					               		,"VALIDATIONRULE" : {
+					               			"USA": 1,
+					               			"IND" : 91,
+					               			"GBR" : 44
+					               		}
+			                            ,"MSG" : "Value should map the country selected"
+					                    ,"MENUITEMLABEL" : "Find unmatched iso code values"
+			                            ,"LOOKUPINDEX" : "32"
+			                   }
+		        }
+	   },
+	   
+	   "34" : {
+		      "VALIDATIONS" : {
+					    	  
+					    	  "find-unmatch" :{
+					               		"TYPE" : "MAP_REGEX"
+					               		,"VALIDATIONRULE" : {
+					            			"USA": /^\d{3}$/,
+					            			"IND" : /^\d{2,4}$/,
+					            			"GBR" : /^[0]?\d{2,5}$/
+					            		}
+			                            ,"MSG" : "Value should map the country selected"
+					                    ,"MENUITEMLABEL" : "Find unmatched country code values"
+			                            ,"LOOKUPINDEX" : "32"
+			                   }
+		        }
+	   },
+	   
 	   "252" : {
 		      "VALIDATIONS" : {
 					    	  

@@ -166,11 +166,11 @@ var WDCT_Timeline = {
 				var val = row[_jindx];
 				if(val.trim() != '') isValidRow = true;
 				obj[_jindx] = row[_jindx];
-				objErr[_jindx] = false;
+				objErr[_jindx] = { error: false, msg: ''};
 				//objErr[_jindx] = WDCT_Timeline.hasError(obj, _jindx, row[_jindx]);
 			}
 			// define id for an row as it is mandatory to have id column
-			obj[id_tag] = _indx;
+			obj[id_tag] = data.length;
 			
 			if(isValidRow){
 			  dataErr.push(objErr);	
@@ -206,7 +206,7 @@ var WDCT_Timeline = {
 		grid = new Slick.Grid(grid_clientId, dataView, columns, WDCT_Timeline.getGridOptions());
 	   
 		var pager = new Slick.Controls.Pager(dataView, grid, $(pager_clientId));
-		
+		//grid.setSelectionModel(new Slick.RowSelectionModel());
 		
 		// wire up model events to drive the grid
 	    dataView.onRowCountChanged.subscribe(function (e, args) {
@@ -249,7 +249,8 @@ var WDCT_Timeline = {
 	    // bind context menu
 	    grid.onContextMenu.subscribe(WDCT_Timeline.onContextMenuHandler);
 	    
-	 // initialize the model after all the events have been hooked up
+	 
+	    // initialize the model after all the events have been hooked up
 	    dataView.beginUpdate();
 	    dataView.setItems(data);
 	    dataView.setFilter(WDCT_Timeline.filter);
@@ -264,6 +265,8 @@ var WDCT_Timeline = {
         overlayPlugin.onFillUpDown.subscribe(WDCT_Timeline.overlayonFillUpDownHandler);
         grid.registerPlugin(overlayPlugin); 
 	    
+   
+        
 	    
 	    WDCT_Timeline.renderGrid();
 	    
@@ -285,7 +288,7 @@ var WDCT_Timeline = {
       }
 
       dataView.endUpdate();
-      grid.render();
+      WDCT_Timeline.renderGrid();
   },
   
   filteronCommandHandler: function (e, args) {
@@ -305,16 +308,19 @@ var WDCT_Timeline = {
   onFilterAppliedHandler: function () {
       dataView.refresh();
       grid.resetActiveCell();  
-      WDCT_Timeline.renderGrid();
+      //WDCT_Timeline.renderGrid();
   },
   
   filter: function (item) {
       var columns = grid.getColumns();
 
       var value = true;
-
+      //console.log(item.id);
       for (var i = 0, colLen = columns.length; i < colLen; i++) {
           var columnDef = columns[i];
+          dataErr[item.id][columnDef.id].error = false;
+      	  dataErr[item.id][columnDef.id].msg = '';
+      	    
           if(typeof WDCT_Validator.columns != 'undefined' && 
           		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&
           		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != 'undefined'){
@@ -326,25 +332,48 @@ var WDCT_Timeline = {
 	          			var val = item[columnDef.field];
 	          			var lookupCell = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["LOOKUPINDEX"];
 	          			var lookupCellValue = '';
+	          			var rule = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["VALIDATIONRULE"];
+	          			var msg = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["MSG"];
 	          			
 	          			if(typeof lookupCell != 'undefined'){
 	          				lookupCellValue = item[lookupCell];
 	          			}
-	          			
-	          			
 	          			if(type == 'DUPLICATE'){
 	          			// if it is DUPLICATE TYPE
 	          	          	if(typeof columnDef['dupData'] != UNDEFINED && columnDef['dupData'][val] == 1){
 	          	          		value = value && false;
+	          	          	}else{
+	          	              dataErr[item.id][columnDef.id].error = true;
+        	          	      dataErr[item.id][columnDef.id].msg = msg;
+        	          	      value = value && true;
 	          	          	}
 	          			}else if(type == 'REGEX'){
 	          			// if it is REGEX TYPE
-	          				var reg_pattern = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["VALIDATIONRULE"];
-	          				value = value && !reg_pattern.test(val.trim());
+	          				var reg_pattern = rule;
+	          				if(reg_pattern.test(val.trim())){
+	          					
+	          					dataErr[item.id][columnDef.id].error = true;
+	        	          	    dataErr[item.id][columnDef.id].msg = msg;
+	        	          	    value = value && true;
+	          				}else{
+	          					value = value && false;
+	          				}
 	          				//console.log(reg_pattern.test(val.trim()));
 	          			}else if(type == 'JSFUNCTION'){
-	          				var func = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["VALIDATIONRULE"];
+	          				var func = rule;
 	          				value = value && !window[func](val, lookupCellValue);
+	          			}else if(type == 'MAP'){
+	          				var jsmap = rule;
+	          				if(typeof jsmap[lookupCellValue.toUpperCase()] != 'undefined') value = value && (jsmap[lookupCellValue.toUpperCase()] != val);
+	          				
+	          			}else if(type == 'MAP_REGEX'){
+	          				var jsmap1 = rule;
+	          				if(typeof jsmap1[lookupCellValue.toUpperCase()] != 'undefined') value = value && !jsmap1[lookupCellValue.toUpperCase()].test(val.trim());
+	          			}
+	          			
+	          			if(value == false){
+	          				dataErr[item.id][columnDef.id].error = true;
+          	          	    dataErr[item.id][columnDef.id].msg = msg;
 	          			}
 	          		}
 	          	}
@@ -383,13 +412,7 @@ var WDCT_Timeline = {
       return value;
       
   },
-  onBeforeEditCellHandler: function(e, args) {
-      // make row un-editable [rows such as weekname, total]
-	 var data = grid.getData();
-  	 dataErr[args.row][args.cell] = WDCT_Timeline.hasError(data.getItem(args.row), args.cell, data.getItem(args.row)[grid.getColumns()[args.cell].field]);
-     
-  	 WDCT_Timeline.renderGrid();
-  },
+  
   
   body_ClickHandler: function () {
       $(contextmenu_clientId).hide();
@@ -592,6 +615,7 @@ var WDCT_Timeline = {
     var isInvalid = false;
     
     
+    /**
     if(typeof WDCT_RELATEDVALIDATIONS != UNDEFINED &&
          typeof WDCT_RELATEDVALIDATIONS[cell] != UNDEFINED && 
          typeof value != UNDEFINED){
@@ -640,7 +664,8 @@ var WDCT_Timeline = {
 		     }
        }
     }
-
+   **/
+    /**
    if(typeof columnArr[cell] != UNDEFINED && columnArr[cell].trim() != '' &&
         typeof WDCT_HEADER_REGEX[columnArr[cell].trim().toUpperCase()] != UNDEFINED && 
         WDCT_HEADER_REGEX[columnArr[cell].trim().toUpperCase()] != '' &&
@@ -655,7 +680,7 @@ var WDCT_Timeline = {
        typeof lookup_sheets_data[cell][value] == UNDEFINED){
         isInvalid = true;
     }
-
+**/
       return isInvalid;
   },
 
@@ -674,7 +699,7 @@ var WDCT_Timeline = {
   
   setAndDisplayErrorCount: function(){
 	  WDCT_Timeline.errorsCount = 0;
-	  for(var indx = 0, indxLen = dataErr.length; indx < indxLen; indx++){
+	  /**for(var indx = 0, indxLen = dataErr.length; indx < indxLen; indx++){
 		  var row = dataErr[indx];
 		  
 		  for(var jindx in row){
@@ -683,7 +708,7 @@ var WDCT_Timeline = {
 			  }
 		  }
 		 
-	  }
+	  }**/
 	  $('#errors').text(WDCT_Timeline.errorsCount);  
   },	
   
@@ -700,6 +725,8 @@ var WDCT_Timeline = {
 	 
 	 // no need for editor in case if it is first column
 	 if(id == 0){
+		 
+		 /**
 		 return {
 	         id: id,
 	         field: field,
@@ -710,6 +737,11 @@ var WDCT_Timeline = {
 	         focusable : false
 	        
 	     } 
+		 **/
+		 return {id: id, name: name, field: field, behavior: "select", cssClass: "cell-selection", width: 40, 
+			 cannotTriggerInsert: true, resizable: false, selectable: false, formatter: WDCT_Timeline.validateFormatter };
+		
+
 	 }
 	 
 	 var column = {
@@ -772,7 +804,7 @@ var WDCT_Timeline = {
           ,enableAsyncPostRender: false
           ,asyncPostRenderDelay : 20 // default 50
           //,leaveSpaceForNewRows : true
-          //,frozenColumn : 4
+          ,frozenColumn : 0
           //,frozenRow : 3
           //,autoHeight: true
           //,fullWidthRows: true
@@ -789,10 +821,13 @@ var WDCT_Timeline = {
         WDCT_Timeline.setAndDisplayErrorCount();
     },
     validateFormatter: function(row, cell, value, columnDef, dataContext) {
-    	
-    	//dataErr[row][cell] = WDCT_Timeline.hasError(dataContext, cell, value);
-    	if(dataErr[row][cell]){
-    		return "<div class='frmt-invalid' style='width:100%;'>" + value + "</div>";
+    	if(columnDef.field == 0){
+    		return row + 1;
+    	}
+    	//console.log(dataContext.id + ':::::' + columnDef.field);
+    	//console.log(dataErr[dataContext.id][columnDef.field].error);
+    	if(dataErr[dataContext.id][columnDef.field].error){
+    		return "<div class='frmt-invalid' title='" + dataErr[row][cell].msg + "' style='width:100%;'>" + value + "</div>";
     	}
     	
     	return value;
