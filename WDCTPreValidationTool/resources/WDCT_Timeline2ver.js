@@ -62,6 +62,18 @@ var A_DATESHOULDGREATERTHAN_B = function(a, b){
 	return (new Date(a) > new Date(b));
 }
 
+var VALIDATE_LOOUPSHEETDATA = function(cell, value){
+	var isInvalid = false;
+	if(typeof lookup_sheets_data != UNDEFINED &&
+		       typeof lookup_sheets_data[cell] != UNDEFINED && 
+		       typeof value != UNDEFINED && 
+		       typeof lookup_sheets_data[cell][value] == UNDEFINED){
+		        isInvalid = true;
+		    }
+	return isInvalid;
+}
+
+
 var WDCT_Timeline = {
   errorsCount : 0,
   
@@ -330,6 +342,11 @@ var WDCT_Timeline = {
       //WDCT_Timeline.renderGrid();
   },
   
+  setDataErrorObj: function(item, columnDef, error, msg){
+	  dataErr[item.id][columnDef.id].error = error;
+	  dataErr[item.id][columnDef.id].msg = msg;
+  },
+  
   filter: function (item) {
       var columns = grid.getColumns();
 
@@ -358,38 +375,43 @@ var WDCT_Timeline = {
 	          			if(typeof lookupCell != UNDEFINED){
 	          				lookupCellValue = item[lookupCell];
 	          			}
+	          			
+	          			
 	          			if(type == 'DUPLICATE'){
 	          			// if it is DUPLICATE TYPE
 	          	          	if(typeof columnDef['dupData'] != UNDEFINED && columnDef['dupData'][val] == 1){
 	          	          		value = value && false;
 	          	          	}else{
-	          	              dataErr[item.id][columnDef.id].error = true;
-        	          	      dataErr[item.id][columnDef.id].msg = msg;
+	          	          	  WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);	
         	          	      value = value && true;
 	          	          	}
 	          			}else if(type == 'REGEX'){
 	          			// if it is REGEX TYPE
 	          				var reg_pattern = rule;
 	          				if(reg_pattern.test(val.trim())){
-	          					
-	          					dataErr[item.id][columnDef.id].error = true;
-	        	          	    dataErr[item.id][columnDef.id].msg = msg;
+	          					WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
 	        	          	    value = value && true;
 	          				}else{
 	          					value = value && false;
 	          				}
 	          				//console.log(reg_pattern.test(val.trim()));
-	          			}else if(type == 'JSFUNCTION'){
+	          			}else if(type == 'JSFUNCTION_COMPARE'){
 	          				var func = rule;
-	          				value = value && !window[func](val, lookupCellValue);
+	          				if(window[func](val, lookupCellValue)) value = value && false;
+	          				else value = value && true, WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);	
+	          				
 	          			}else if(type == 'MAP'){
 	          				var jsmap = rule;
-	          				if(typeof jsmap[lookupCellValue.toUpperCase()] != UNDEFINED) value = value && (jsmap[lookupCellValue.toUpperCase()] != val);
+	          				if(typeof jsmap[lookupCellValue.toUpperCase()] != UNDEFINED) value = value && (jsmap[lookupCellValue.toUpperCase()] != val), value&&WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
 	          				else value = value && false;
 	          			}else if(type == 'MAP_REGEX'){
 	          				var jsmap1 = rule;
-	          				if(typeof jsmap1[lookupCellValue.toUpperCase()] != UNDEFINED) value = value && !jsmap1[lookupCellValue.toUpperCase()].test(val.trim());
+	          				if(typeof jsmap1[lookupCellValue.toUpperCase()] != UNDEFINED) value = value && !jsmap1[lookupCellValue.toUpperCase()].test(val.trim()), value&&WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
 	          				else value = value && false;
+	          			}else if(type == 'JSFUNCTION_LOOKUP'){
+	          				var func1 = rule;
+	          				if(!window[func1](columnDef.id, val)) value = value && false;
+	          				else value = value && true, WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
 	          			}
 	          			
 	          		}
