@@ -359,7 +359,8 @@
 
         function setButtonImage($el, filtered) {
             var image = "url(" + (filtered ? options.filterImage : options.buttonImage) + ")";
-
+            var bgColor = (filtered ? '#f4ad42' : 'transparent');
+            $el.css("background-color", bgColor);
             $el.css("background-image", image);
         }
 

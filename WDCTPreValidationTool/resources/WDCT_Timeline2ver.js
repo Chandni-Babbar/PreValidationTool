@@ -230,11 +230,8 @@ var WDCT_Timeline = {
 	      
 	    //});
 	    grid.registerPlugin(headerButtonsPlugin);
-	    grid.onHeaderClick.subscribe(function(e, args) {
-	        var columnID = args.column.id;
-	        grid.gotoCell(0, columnID);
-	        WDCT_Timeline.selectColumnRange(columnID);
-	    });
+	    grid.onHeaderClick.subscribe(WDCT_Timeline.onHeaderClickHandler);
+	    
 	    grid.setSelectionModel(new Slick.CellSelectionModel());
 	    
 	    /** COPY MANAGER PLUGIN **/
@@ -271,6 +268,28 @@ var WDCT_Timeline = {
 	    WDCT_Timeline.renderGrid();
 	    
   },
+  
+  onRowClickHandler: function(evt, dataContextId){
+	  var rowId = dataContextId;
+	  //console.log(rowId);
+	  grid.gotoCell(rowId, 0);
+	  WDCT_Timeline.selectRowRange(rowId);
+	  
+	  if(typeof evt.stopPropagation != UNDEFINED) {
+	        evt.stopPropagation();
+	  }else {
+	        evt.cancelBubble = true;
+	  }
+  },
+  
+  onHeaderClickHandler: function(e, args) {
+      var columnID = args.column.field;
+      grid.gotoCell(0, columnID);
+      WDCT_Timeline.selectColumnRange(columnID);
+      
+      e.stopPropagation();
+  },
+  
   overlayonFillUpDownHandler: function (e, args) {
       var column = grid.getColumns()[args.range.fromCell];
 
@@ -321,9 +340,10 @@ var WDCT_Timeline = {
           dataErr[item.id][columnDef.id].error = false;
       	  dataErr[item.id][columnDef.id].msg = '';
       	    
-          if(typeof WDCT_Validator.columns != 'undefined' && 
-          		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&
-          		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != 'undefined'){
+          if(typeof WDCT_Validator != UNDEFINED && 
+        		typeof WDCT_Validator.columns != UNDEFINED && 
+          		typeof WDCT_Validator.columns[columnDef.id] != UNDEFINED &&
+          		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != UNDEFINED){
 	          	for(var _a in WDCT_Validator.columns[columnDef.id]["VALIDATIONS"]){
 	          		var applyValidation = columnDef[_a] || false;
 	          		if(applyValidation){
@@ -335,7 +355,7 @@ var WDCT_Timeline = {
 	          			var rule = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["VALIDATIONRULE"];
 	          			var msg = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["MSG"];
 	          			
-	          			if(typeof lookupCell != 'undefined'){
+	          			if(typeof lookupCell != UNDEFINED){
 	          				lookupCellValue = item[lookupCell];
 	          			}
 	          			if(type == 'DUPLICATE'){
@@ -364,51 +384,20 @@ var WDCT_Timeline = {
 	          				value = value && !window[func](val, lookupCellValue);
 	          			}else if(type == 'MAP'){
 	          				var jsmap = rule;
-	          				if(typeof jsmap[lookupCellValue.toUpperCase()] != 'undefined') value = value && (jsmap[lookupCellValue.toUpperCase()] != val);
-	          				
+	          				if(typeof jsmap[lookupCellValue.toUpperCase()] != UNDEFINED) value = value && (jsmap[lookupCellValue.toUpperCase()] != val);
+	          				else value = value && false;
 	          			}else if(type == 'MAP_REGEX'){
 	          				var jsmap1 = rule;
-	          				if(typeof jsmap1[lookupCellValue.toUpperCase()] != 'undefined') value = value && !jsmap1[lookupCellValue.toUpperCase()].test(val.trim());
+	          				if(typeof jsmap1[lookupCellValue.toUpperCase()] != UNDEFINED) value = value && !jsmap1[lookupCellValue.toUpperCase()].test(val.trim());
+	          				else value = value && false;
 	          			}
 	          			
-	          			if(value == false){
-	          				dataErr[item.id][columnDef.id].error = true;
-          	          	    dataErr[item.id][columnDef.id].msg = msg;
-	          			}
 	          		}
 	          	}
           }
       }
       
-      /**
-      for (var i = 0, colLen = columns.length; i < colLen; i++) {
-          var col = columns[i];
-          var filterValues = col.filterValues;
-          var dup = col.findDup;
-          var dt = col.findDt;
-          var iv = col.findIv;
-
-          if (filterValues && filterValues.length > 0) {
-              value = value & _.contains(filterValues, item[col.field]);
-          }
-          
-          if(dup){
-          	// get duplicate code here
-          	var val = item[col.field];
-          	if(typeof col.dupData != UNDEFINED && col.dupData[val] == 1){
-          		value = false;
-          	}
-          }
-          
-          if(dt){
-          	value = WDCT_Timeline.hasDataTypeError(item, col.field, item[col.field]);
-          }
-          
-          if(iv){
-          	value = WDCT_Timeline.hasValidValuesError(item, col.field, item[col.field]);
-          }
-      }
-      **/
+     
       return value;
       
   },
@@ -504,7 +493,16 @@ var WDCT_Timeline = {
     	
     	
     },
-    
+    selectRowRange: function(row){
+    	var ranges = [];
+    	//remove previous selected
+    	grid.getSelectionModel().setSelectedRanges([]);
+    	//console.log(row);
+    	ranges.push(new Slick.Range(row, 1, row, columns.length - 1));
+    	//console.log(ranges);
+    	grid.getSelectionModel().setSelectedRanges(ranges);
+    	
+    },
     
     contextMenuClickHandler:function (e) {
         //alert($(e.target).is("button"));
@@ -535,7 +533,7 @@ var WDCT_Timeline = {
                          for (var i = 0; i <= from.toRow - from.fromRow; i++) {
                               
                               for (var j = 0; j <= from.toCell - from.fromCell; j++) {
-                            	  if(typeof dataView.getItem(from.fromRow + i) == 'undefined') continue;
+                            	  if(typeof dataView.getItem(from.fromRow + i) == UNDEFINED) continue;
                             	  var rowId = dataView.getItem(from.fromRow + i).id;
                                   var field = columns[from.fromCell + j].field;
                                   var value = dataView.getItem(from.fromRow + i)[columns[from.fromCell + j].field];
@@ -741,7 +739,6 @@ var WDCT_Timeline = {
 		 return {id: id, name: name, field: field, behavior: "select", cssClass: "cell-selection", width: 40, 
 			 cannotTriggerInsert: true, resizable: false, selectable: false, formatter: WDCT_Timeline.validateFormatter };
 		
-
 	 }
 	 
 	 var column = {
@@ -822,7 +819,8 @@ var WDCT_Timeline = {
     },
     validateFormatter: function(row, cell, value, columnDef, dataContext) {
     	if(columnDef.field == 0){
-    		return row + 1;
+    		//return row + 1;
+    		return "<div onclick='WDCT_Timeline.onRowClickHandler(event," + row + ");' style='height:100%;width:100%;'>" + (row + 1) + "</div>";
     	}
     	//console.log(dataContext.id + ':::::' + columnDef.field);
     	//console.log(dataErr[dataContext.id][columnDef.field].error);

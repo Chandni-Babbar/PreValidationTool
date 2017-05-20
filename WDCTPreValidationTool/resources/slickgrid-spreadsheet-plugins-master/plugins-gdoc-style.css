@@ -12,10 +12,10 @@ body, BUTTON {
 .slick-cell {
     border-color: transparent #CCCCCC #CCCCCC transparent;
     border-style: solid solid solid solid;
-    border-width: 0px 1px 1px 0px;
-    padding: 4px 4px 0px 6px;
+    /**border-width: 0px 1px 1px 0px;
+    padding: 4px 4px 0px 6px;**/
     background-color: White;
-    font: 9pt arial, sans-serif;
+    /**font: 9pt arial, sans-serif;**/
 }
 
 .slick-header-column {
@@ -25,7 +25,7 @@ body, BUTTON {
 }
 
 .slick-header-columns {
-    font: 9pt arial, sans-serif;
+    /**font: 9pt arial, sans-serif;**/
     color: black;
     background-color: #F3F3F3;
     border-top: 1px solid #CCCCCC;
@@ -71,7 +71,7 @@ body, BUTTON {
     border-bottom: 1px dashed #808080;
 }
 input.editor-text {
-    font: 9pt arial, sans-serif;
+    /**font: 9pt arial, sans-serif;**/
     background: none;
     border: 0 none;
     margin: 0;
