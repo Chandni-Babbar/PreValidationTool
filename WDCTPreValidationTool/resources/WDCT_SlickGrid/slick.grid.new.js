@@ -3279,13 +3279,17 @@ if (typeof Slick === "undefined") {
         }
 
         function scrollCellIntoView(row, cell, doPaging) {
+        	
             // Don't scroll to frozen cells
             if (cell <= options.frozenColumn) {
                 return;
             }
-
+            
             if (row < actualFrozenRow) {
                 scrollRowIntoView(row, doPaging);
+            }else if(actualFrozenRow == -1){
+            	// scroll generically in case no frozen row defined
+            	scrollRowIntoView(row, doPaging);
             }
 
             var colspan = getColspan(row, cell);
@@ -3606,14 +3610,15 @@ if (typeof Slick === "undefined") {
             if (hasFrozenRows && !options.frozenBottom) {
                 row -= actualFrozenRow;
             }
-
+            console.log(row);
             var viewportScrollH = $viewportScrollContainerY.height();
 
             var rowAtTop = row * options.rowHeight;
             var rowAtBottom = (row + 1) * options.rowHeight
                 - viewportScrollH
                 + (viewportHasHScroll ? scrollbarDimensions.height : 0);
-
+            console.log(rowAtTop);
+            console.log(rowAtBottom);
             // need to page down?
             if ((row + 1) * options.rowHeight > scrollTop + viewportScrollH + offset) {
                 scrollTo(doPaging ? rowAtTop : rowAtBottom);
@@ -3761,6 +3766,7 @@ if (typeof Slick === "undefined") {
         function gotoDown(row, cell, posX) {
             var prevCell;
             var dataLengthIncludingAddNew = getDataLengthIncludingAddNew();
+            //console.log('i am called gotoDown');
             while (true) {
                 if (++row >= dataLengthIncludingAddNew) {
                     return null;
@@ -3939,6 +3945,8 @@ if (typeof Slick === "undefined") {
             var pos = stepFn(activeRow, activeCell, activePosX);
 
             if (pos) {
+            	//console.log(pos);
+            	
                 if (hasFrozenRows && options.frozenBottom & pos.row == getDataLength()) {
                     return;
                 }
@@ -3948,9 +3956,10 @@ if (typeof Slick === "undefined") {
                 if (( !options.frozenBottom && pos.row >= actualFrozenRow )
                     || ( options.frozenBottom && pos.row < actualFrozenRow )
                     ) {
+                	//console.log('i am in');
                     scrollCellIntoView(pos.row, pos.cell, !isAddNewRow);
                 }
-
+             
                 setActiveCellInternal(getCellNode(pos.row, pos.cell))
                 activePosX = pos.posX;
                 return true;
