@@ -350,9 +350,16 @@ var WDCT_Timeline = {
       }
   },
   onFilterAppliedHandler: function () {
-      dataView.refresh();
+	  for(var indx = 0, indxLen = dataErr.length; indx < indxLen; indx++){
+		  var row = dataErr[indx];
+		  for(var jindx in row){
+			  row[jindx].error = false;
+		  }
+	  }
+	  dataView.refresh();
       grid.resetActiveCell();  
       WDCT_Timeline.removeSelection();
+      
       WDCT_Timeline.renderGrid();
   },
   
@@ -361,22 +368,33 @@ var WDCT_Timeline = {
 	  dataErr[item.id][columnDef.id].msg = msg;
   },
   
-  filter: function (item) {
-      var columns = grid.getColumns();
+  runAllFilterValidations: function(){
+	  var data = grid.getData(); 
+	  for(var R = 0, RLen = data.getLength(); R <= RLen; R++){
+  		  var row = data.getItem(R - 1);
+  		  if(typeof row != UNDEFINED) {WDCT_Timeline.filter(row, true);}
+      }; 
+      WDCT_Timeline.renderGrid();  
+  },
+  
+  filter: function (item, applyValid) {
+      //var columns = grid.getColumns();
 
       var value = true;
       //console.log(item.id);
       for (var i = 0, colLen = columns.length; i < colLen; i++) {
           var columnDef = columns[i];
-          dataErr[item.id][columnDef.id].error = false;
-      	  dataErr[item.id][columnDef.id].msg = '';
-      	    
+          
+      	  WDCT_Timeline.setDataErrorObj(item, columnDef, false, '');
+      	  
+      	  
           if(typeof WDCT_Validator != UNDEFINED && 
         		typeof WDCT_Validator.columns != UNDEFINED && 
           		typeof WDCT_Validator.columns[columnDef.id] != UNDEFINED &&
           		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != UNDEFINED){
 	          	for(var _a in WDCT_Validator.columns[columnDef.id]["VALIDATIONS"]){
-	          		var applyValidation = columnDef[_a] || false;
+	          		//var applyValidation = columnDef[_a] || false;
+	          		var applyValidation = columnDef[_a] || applyValid || false;
 	          		if(applyValidation){
 	          			//what type of validation
 	          			var type = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["TYPE"];
@@ -756,16 +774,16 @@ var WDCT_Timeline = {
   
   setAndDisplayErrorCount: function(){
 	  WDCT_Timeline.errorsCount = 0;
-	  /**for(var indx = 0, indxLen = dataErr.length; indx < indxLen; indx++){
+	  for(var indx = 0, indxLen = dataErr.length; indx < indxLen; indx++){
 		  var row = dataErr[indx];
 		  
 		  for(var jindx in row){
-			  if(row[jindx] == true){
+			  if(row[jindx].error == true){
 				  WDCT_Timeline.errorsCount++;
 			  }
 		  }
 		 
-	  }**/
+	  }
 	  $('#errors').text(WDCT_Timeline.errorsCount);  
   },	
   

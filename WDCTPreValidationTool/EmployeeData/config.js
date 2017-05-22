@@ -89,7 +89,13 @@ var WDCT_Validator = {
 				                  ,"MENUITEMLABEL" : "blanks"
 				                  ,"LOOKUPINDEX": ""	  
 			                   },
-			                   
+			                   "find-input-val" : {
+								   "TYPE" : "JSFUNCTION_INPUT_EQUALS"
+								   ,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
+								   ,"MSG" : ""
+		    	                   ,"MENUITEMLABEL" : "value equals to "
+		    	                   ,"LOOKUPINDEX": "" 	   
+								},
 				              "find-lookup-sheet-value" : {
 												   "TYPE" : "JSFUNCTION_LOOKUP"
 												   ,"VALIDATIONRULE" : "VALIDATE_LOOUPSHEETDATA"
