@@ -54,6 +54,10 @@ $(function() {
 });
 
 
+var FILTER_A_EQUALS_B = function(a, b){
+	return !(a == b);
+}
+
 var A_DATESHOULDLESSTHAN_B = function(a, b){
 	return (new Date(a) < new Date(b));
 }
@@ -120,10 +124,19 @@ var WDCT_Timeline = {
 					lookup_sheets_data[_a] = {};
 					var sheetName = colConfig[_a].sheet;
 					var col = colConfig[_a].col;
+					var display = colConfig[_a].display;
+					var mergeWithCol = null;
+					
+					if(typeof colConfig[_a].display != UNDEFINED && 
+							typeof colConfig[_a].display.mergeWithCol != UNDEFINED){
+						mergeWithCol = colConfig[_a].display.mergeWithCol;
+					}
+					
 					var sheet_data = to_multiArray(wb, sheetName);
 					
 					for(var _indx = data_startindex, len = sheet_data.length; _indx < len; _indx++){
-						lookup_sheets_data[_a][sheet_data[_indx][col]] = sheet_data[_indx][col];
+						lookup_sheets_data[_a][sheet_data[_indx][col]] =  mergeWithCol == null ? 
+								sheet_data[_indx][col]: sheet_data[_indx][col] + ' + ' + sheet_data[_indx][mergeWithCol];
 					}
 					sheetName = null;
 					col = null;
@@ -339,7 +352,8 @@ var WDCT_Timeline = {
   onFilterAppliedHandler: function () {
       dataView.refresh();
       grid.resetActiveCell();  
-      //WDCT_Timeline.renderGrid();
+      WDCT_Timeline.removeSelection();
+      WDCT_Timeline.renderGrid();
   },
   
   setDataErrorObj: function(item, columnDef, error, msg){
@@ -388,11 +402,22 @@ var WDCT_Timeline = {
 	          			}else if(type == 'REGEX'){
 	          			// if it is REGEX TYPE
 	          				var reg_pattern = rule;
-	          				if(reg_pattern.test(val.trim())){
-	          					WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
-	        	          	    value = value && true;
+	          				
+	          				if(WDCT_REGEX.BLANK == reg_pattern){
+		          				if(reg_pattern.test(val.trim())){
+		          					WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
+		        	          	    value = value && true;
+		          				}else{
+		          					value = value && false;
+		          				}
 	          				}else{
-	          					value = value && false;
+	          					if(reg_pattern.test(val.trim())){
+	          						value = value && false;
+		          				}else{
+		          					
+		          					WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
+		        	          	    value = value && true;
+		          				}
 	          				}
 	          				//console.log(reg_pattern.test(val.trim()));
 	          			}else if(type == 'JSFUNCTION_COMPARE'){
@@ -411,6 +436,11 @@ var WDCT_Timeline = {
 	          			}else if(type == 'JSFUNCTION_LOOKUP'){
 	          				var func1 = rule;
 	          				if(!window[func1](columnDef.id, val)) value = value && false;
+	          				else value = value && true, WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
+	          			}else if(type == 'JSFUNCTION_INPUT_EQUALS'){
+	          				var filterValue = typeof columnDef['filterValues'] != UNDEFINED && columnDef['filterValues']; 
+	          				var func = rule;
+	          				if(window[func](val, filterValue)) value = value && false;
 	          				else value = value && true, WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
 	          			}
 	          			
@@ -503,11 +533,18 @@ var WDCT_Timeline = {
       
     },
     
+    removeSelection: function(){
+    	
+    	//remove previous selected
+    	grid.getSelectionModel().setSelectedRanges([]);
+    },
+    
+    
     selectColumnRange: function(cell){
     	
     	var ranges = [];
     	//remove previous selected
-    	grid.getSelectionModel().setSelectedRanges([]);
+    	WDCT_Timeline.removeSelection();
     	
     	ranges.push(new Slick.Range(0, cell, grid.getData().getLength() - 1, cell));
     	grid.getSelectionModel().setSelectedRanges(ranges);
@@ -518,7 +555,7 @@ var WDCT_Timeline = {
     selectRowRange: function(row){
     	var ranges = [];
     	//remove previous selected
-    	grid.getSelectionModel().setSelectedRanges([]);
+    	WDCT_Timeline.removeSelection();
     	//console.log(row);
     	ranges.push(new Slick.Range(row, 1, row, columns.length - 1));
     	//console.log(ranges);
@@ -597,7 +634,7 @@ var WDCT_Timeline = {
                           } 
                           
                           
-                         grid.getSelectionModel().setSelectedRanges([]);
+                         WDCT_Timeline.removeSelection();
                          // initialize the model after all the events have been hooked up
                          dataView.endUpdate();
                          WDCT_Timeline.renderGrid(); 

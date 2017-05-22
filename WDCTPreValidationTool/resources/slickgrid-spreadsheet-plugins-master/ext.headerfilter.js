@@ -113,6 +113,14 @@
             .appendTo(menu);
         }
 
+        function addMenuCheckboxWithInput(menu, columnDef, title, command, filtered, filterValue) {
+            $("<label><input class='" + command + "' type='checkbox' value='000'" + (filtered ? " checked='checked'" : "") + "  />" + title + "<input class='" + (command +'_input') + "' type='text' value='" + filterValue + "'/></label>")
+            .data("command", command)
+            .data("column", columnDef)
+            //.bind("click", handleMenuItemClick)
+            .appendTo(menu);
+        }
+        
         function updateFilterInputs(menu, columnDef, filterItems) {
             var filterOptions = "<label><input type='checkbox' value='-1' />(Select All)</label>";
             columnDef.filterValues = columnDef.filterValues || [];
@@ -142,7 +150,7 @@
             var $menuButton = $(this);
             var columnDef = $menuButton.data("column");
 
-            columnDef.filterValues = columnDef.filterValues || [];
+            columnDef.filterValues = columnDef.filterValues || '';
             
             
             
@@ -152,7 +160,7 @@
             //columnDef.dupData = columnDef.dupData || {};
             
             // WorkingFilters is a copy of the filters to enable apply/cancel behaviour
-            var workingFilters = columnDef.filterValues.slice(0);
+            //var workingFilters = columnDef.filterValues.slice(0);
 
             
             /**
@@ -173,25 +181,37 @@
 
             $menu.empty();
 
+            
+            $("<label style='font-weight:bold;text-decoration:underline'>Filter the column data having:</label>")
+            .appendTo($menu);
+            
             //addMenuItem($menu, columnDef, 'Sort Ascending', 'sort-asc', options.sortAscImage);
             //addMenuItem($menu, columnDef, 'Sort Descending', 'sort-desc', options.sortDescImage);
+            
+            
+            //addMenuCheckboxWithInput($menu, columnDef, 'filter', 'find-text_default', columnDef['find-text_default']);
+            //$('.find-text_default:checkbox', $menu).bind('click', function () {
+            	//columnDef[find-text_default] = $(this).attr('checked') || false; 
+            //});
+            
             
             if(typeof WDCT_Validator.columns != 'undefined' && 
             		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&
             		typeof WDCT_Validator.columns[columnDef.id]['VALIDATIONS'] != 'undefined'){
             	for(var _a in WDCT_Validator.columns[columnDef.id]["VALIDATIONS"]){
             		columnDef[_a] = columnDef[_a] || false;
+            		var type = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["TYPE"];
+            		var label = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["MENUITEMLABEL"];
             		
-            		
-            		
-            		if(WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["TYPE"] == 'DUPLICATE'){
+            		if(type == 'DUPLICATE'){
             			columnDef['dupData'] = columnDef['dupData'] || {};
             		}
             		
-            		
-            		var label = WDCT_Validator.columns[columnDef.id]["VALIDATIONS"][_a]["MENUITEMLABEL"];
-            		
-            		addMenuCheckbox($menu, columnDef, label, _a, columnDef[_a]);
+            		if(type == "JSFUNCTION_INPUT_EQUALS"){
+            			addMenuCheckboxWithInput($menu, columnDef, label, _a, columnDef[_a], columnDef.filterValues);
+            		}else{ 
+            			addMenuCheckbox($menu, columnDef, label, _a, columnDef[_a]);
+            		}
             		
             		$('.' + _a + ':checkbox', $menu).bind('click', function () {
                     	columnDef[$(this).attr('class')] = $(this).attr('checked') || false; 
@@ -238,7 +258,7 @@
             $('<button>OK</button>')
                 .appendTo($menu)
                 .bind('click', function (ev) {
-                    columnDef.filterValues = workingFilters.splice(0);
+                	columnDef.filterValues = $('input[type=text]', $menu).val();                	
                     
                     var isSelected = false;
                     if(typeof WDCT_Validator.columns != 'undefined' && 
@@ -266,11 +286,11 @@
         	                        
         	                    }
         	                    
-        	                    console.log(columnDef['dupData']);
+        	                    //console.log(columnDef['dupData']);
                     		}
                     	}
                     }
-                    setButtonImage($menuButton, columnDef.filterValues.length > 0 || isSelected);
+                    setButtonImage($menuButton, isSelected);
                     
                     if(isSelected){
                     	WDCT_Validator.validatingColumn = columnDef.id;
@@ -282,7 +302,7 @@
             $('<button>Clear</button>')
                 .appendTo($menu)
                 .bind('click', function (ev) {
-                    columnDef.filterValues.length = 0;
+                	columnDef.filterValues = '';
                     
                     if(typeof WDCT_Validator.columns != 'undefined' && 
                     		typeof WDCT_Validator.columns[columnDef.id] != 'undefined' &&

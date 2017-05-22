@@ -3525,7 +3525,7 @@ if (typeof Slick === "undefined") {
 
             // walk up the tree
             var offsetParent = elem.offsetParent;
-            while ((elem = elem.parentNode) != document.body) {
+            while ((elem = elem.parentNode) != document.body && elem != null) {
                 if (box.visible && elem.scrollHeight != elem.offsetHeight && $(elem).css("overflowY") != "visible") {
                     box.visible = box.bottom > elem.scrollTop && box.top < elem.scrollTop + elem.clientHeight;
                 }
