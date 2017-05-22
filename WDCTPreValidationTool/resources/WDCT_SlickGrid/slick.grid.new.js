@@ -3610,15 +3610,15 @@ if (typeof Slick === "undefined") {
             if (hasFrozenRows && !options.frozenBottom) {
                 row -= actualFrozenRow;
             }
-            console.log(row);
+            //console.log(row);
             var viewportScrollH = $viewportScrollContainerY.height();
 
             var rowAtTop = row * options.rowHeight;
             var rowAtBottom = (row + 1) * options.rowHeight
                 - viewportScrollH
                 + (viewportHasHScroll ? scrollbarDimensions.height : 0);
-            console.log(rowAtTop);
-            console.log(rowAtBottom);
+            //console.log(rowAtTop);
+            //console.log(rowAtBottom);
             // need to page down?
             if ((row + 1) * options.rowHeight > scrollTop + viewportScrollH + offset) {
                 scrollTo(doPaging ? rowAtTop : rowAtBottom);
