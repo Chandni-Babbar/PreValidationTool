@@ -82,6 +82,7 @@
   			   click here to select a file: <input type="file" name="xlfile" id="xlf" />
   			   </div>
   			   <div style="float:right;">
+  			   <span><button onclick="WDCT_Timeline.runAllFilterValidations();">Run Validations</button><button onclick="WDCT_Timeline.clearAllFilterValidations();">Clear Validations</button></span>
   			   <span>Current sheet has <span id="errors"></span> errors.</span>
   			   <a id='downloadLink'></a>
                <a id="" href="javascript:void(0);" class="excel_button" style="display:inline-block;" title="Download grid in Excel format" onclick="return WDCT_Timeline.downloadExcel_Click();">Download XLSX</a>
@@ -126,3 +127,4 @@
     </div>
   </body>
 </html>
+

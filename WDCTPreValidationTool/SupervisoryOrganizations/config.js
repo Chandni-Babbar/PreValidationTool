@@ -64,7 +64,8 @@ var WDCT_LookUpConfig = {
 		"SUPERVISORY ORGANIZATIONS" : {
 			"4": {
 				"sheet" : "LOCATIONS",
-				"col": 1
+				"col": 1,
+				"display": { mergeWithCol : 2} 
 			}
 		}
 }

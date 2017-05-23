@@ -30,6 +30,32 @@
 	    var scope = this;
 	    this.init = function () {
 	      $select = $("<SELECT tabIndex='0' class='editor-yesno'></SELECT>");
+	      
+	      $select.click(function(e){
+	    	  e.stopImmediatePropagation();
+	    	  //e.stopPropagation();
+	      });
+	      
+	      $select.change(function(e){
+	    	  e.stopImmediatePropagation();
+	    	  //e.stopPropagation();
+	      });
+	      
+	      $select.focus(function(e){
+	    	  e.stopImmediatePropagation();
+	    	  //e.stopPropagation();
+	      });
+	      
+	      $select.select(function(e){
+	    	  e.stopImmediatePropagation();
+	    	  //e.stopPropagation();
+	      });
+	      
+	      $select.blur(function(e){
+	    	  e.stopImmediatePropagation();
+	    	  //e.stopPropagation();
+	      });
+	      
 	      if(typeof args.column.field != 'undefined' &&
 	 			 typeof lookup_sheets_data != 'undefined' &&
 	 			 typeof lookup_sheets_data[args.column.field] != 'undefined' ){
@@ -50,10 +76,8 @@
 	      $select.appendTo(args.container);
 	      $select.focus();
 	      
-	      $select.click(function(e){
-	    	  e.stopImmediatePropagation();
-	    	  //e.stopPropagation();
-	      });
+	      
+	      
 	    };
 
 	    this.destroy = function () {

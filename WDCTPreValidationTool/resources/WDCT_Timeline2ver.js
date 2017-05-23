@@ -368,6 +368,17 @@ var WDCT_Timeline = {
 	  dataErr[item.id][columnDef.id].msg = msg;
   },
   
+  clearAllFilterValidations: function(){
+	  for(var indx = 0, indxLen = dataErr.length; indx < indxLen; indx++){
+		  var row = dataErr[indx];
+		  for(var jindx in row){
+			  row[jindx].error = false;
+		  }
+	  }
+      WDCT_Timeline.renderGrid(); 
+  },
+  
+  
   runAllFilterValidations: function(){
 	  var data = grid.getData(); 
 	  for(var R = 0, RLen = data.getLength(); R <= RLen; R++){
