@@ -51,6 +51,48 @@ var WDCT_Validator = {
 		      }
 		     
 	   },
+
+
+	   "2" : {
+		      "VALIDATIONS" : {
+		      	"find-WKDYSPC" :{
+					"TYPE" : "REGEX"
+					,"VALIDATIONRULE" : /(Apprentice|Casual|Fixed Term Contract|Intern|Regular|Seasonal|Temporary)$/i
+					,"MSG" : "Invalid Employee Type"
+					,"MENUITEMLABEL" : "Invalid Employee Type"
+					,"LOOKUPINDEX": ""	  
+					},
+					"find-input-val" : {
+					"TYPE" : "JSFUNCTION_INPUT_EQUALS"
+					,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
+					,"MSG" : ""
+					,"MENUITEMLABEL" : "value equals to "
+					,"LOOKUPINDEX": ""
+				}
+		    }
+	   },
+	   "3" : {
+		      "VALIDATIONS" : {
+		      	"find-WKDYSPC" :{
+					"TYPE" : "REGEX"
+					,"VALIDATIONRULE" : /(Active|Terminated|On Leave)$/i
+					,"MSG" : "Invalid Employee Status"
+					,"MENUITEMLABEL" : "Invalid Employee Status"
+					,"LOOKUPINDEX": ""	  
+					},
+					"find-input-val" : {
+					"TYPE" : "JSFUNCTION_INPUT_EQUALS"
+					,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
+					,"MSG" : ""
+					,"MENUITEMLABEL" : "value equals to "
+					,"LOOKUPINDEX": ""
+				}
+		    }
+	   },
+
+
+
+
 	   
 	   "4" : {
 		      "VALIDATIONS" : {

@@ -59,7 +59,12 @@ var FILTER_A_EQUALS_B = function(a, b){
 }
 
 var A_DATESHOULDLESSTHAN_B = function(a, b){
-	return (new Date(a) < new Date(b));
+	if(b != ''){
+		return (new Date(a) < new Date(b));
+	}
+	else{
+		return true;
+	}
 }
 
 var A_DATESHOULDGREATERTHAN_B = function(a, b){
@@ -404,7 +409,6 @@ var WDCT_Timeline = {
       //console.log(item.id);
       for (var i = 0, colLen = columns.length; i < colLen; i++) {
           var columnDef = columns[i];
-          
       	  WDCT_Timeline.resetDataErrorObj(item, columnDef);
       	  
       	  
@@ -431,6 +435,7 @@ var WDCT_Timeline = {
 	          			
 	          			if(type == 'DUPLICATE'){
 	          			// if it is DUPLICATE TYPE
+	          			console.log("columnDef['dupData']" + columnDef['dupData'][val]);
 	          	          	if(typeof columnDef['dupData'] != UNDEFINED && columnDef['dupData'][val] == 1){
 	          	          		value = value && false;
 	          	          	}else if(typeof columnDef['dupData'] != UNDEFINED){
