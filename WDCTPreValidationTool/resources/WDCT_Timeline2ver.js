@@ -191,7 +191,7 @@ var WDCT_Timeline = {
 				var val = row[_jindx];
 				if(val.trim() != '') isValidRow = true;
 				obj[_jindx] = row[_jindx];
-				objErr[_jindx] = { error: false, msg: ''};
+				objErr[_jindx] = { error: false, msg: {}};
 				//objErr[_jindx] = WDCT_Timeline.hasError(obj, _jindx, row[_jindx]);
 			}
 			// define id for an row as it is mandatory to have id column
@@ -362,12 +362,21 @@ var WDCT_Timeline = {
       
       WDCT_Timeline.renderGrid();
   },
-  
+  resetDataErrorObj: function(item, columnDef){
+	  dataErr[item.id][columnDef.id].error = false;
+	  delete dataErr[item.id][columnDef.id].msg;
+	  dataErr[item.id][columnDef.id].msg = {};
+  },
   setDataErrorObj: function(item, columnDef, error, msg){
 	  dataErr[item.id][columnDef.id].error = error;
-	  dataErr[item.id][columnDef.id].msg = msg;
+	  //dataErr[item.id][columnDef.id].msg = msg;
+	  dataErr[item.id][columnDef.id].msg[msg] = '';
   },
-  
+  removeDataErrorObj: function(item, columnDef, error, msg){
+	  dataErr[item.id][columnDef.id].error = error;
+	  //dataErr[item.id][columnDef.id].msg = msg;
+	  if(typeof dataErr[item.id][columnDef.id].msg[msg] != 'undefined') delete dataErr[item.id][columnDef.id].msg[msg];
+  },
   clearAllFilterValidations: function(){
 	  for(var indx = 0, indxLen = dataErr.length; indx < indxLen; indx++){
 		  var row = dataErr[indx];
@@ -396,7 +405,7 @@ var WDCT_Timeline = {
       for (var i = 0, colLen = columns.length; i < colLen; i++) {
           var columnDef = columns[i];
           
-      	  WDCT_Timeline.setDataErrorObj(item, columnDef, false, '');
+      	  WDCT_Timeline.resetDataErrorObj(item, columnDef);
       	  
       	  
           if(typeof WDCT_Validator != UNDEFINED && 
@@ -424,7 +433,7 @@ var WDCT_Timeline = {
 	          			// if it is DUPLICATE TYPE
 	          	          	if(typeof columnDef['dupData'] != UNDEFINED && columnDef['dupData'][val] == 1){
 	          	          		value = value && false;
-	          	          	}else{
+	          	          	}else if(typeof columnDef['dupData'] != UNDEFINED){
 	          	          	  WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);	
         	          	      value = value && true;
 	          	          	}
@@ -913,7 +922,7 @@ var WDCT_Timeline = {
     	//console.log(dataContext.id + ':::::' + columnDef.field);
     	//console.log(dataErr[dataContext.id][columnDef.field].error);
     	if(dataErr[dataContext.id][columnDef.field].error){
-    		return "<div class='frmt-invalid' title='" + dataErr[row][cell].msg + "' style='width:100%;'>" + value + "</div>";
+    		return "<div class='frmt-invalid' title='" + Object.keys(dataErr[row][cell].msg).join(';') + "' style='width:100%;'>" + value + "</div>";
     	}
     	
     	return value;
