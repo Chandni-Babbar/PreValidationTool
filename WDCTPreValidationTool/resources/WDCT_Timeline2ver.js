@@ -35,6 +35,7 @@ var preparing_to_load_msg = 'Preparing to load. Please wait..';
 var lastChunkMergeText = '{lastChunk}';
 var _resLenMergeText = '{_resLen}';
 var processing_continue_msg = 'Processed ::' + lastChunkMergeText + ' out of ' + _resLenMergeText + ' records..';
+var dataSeparator = ' + ';
 
 //var xlsx_ws = {};
 var xlsx_ws = [];
@@ -83,6 +84,16 @@ var VALIDATE_LOOUPSHEETDATA = function(cell, value){
 }
 
 
+
+var VALIDATE_LOOUPSHEETDATACOMPARE = function(cell, value, lookupCell, lookupCellValue){
+	var sheetDataofLookupCell = lookup_sheets_data[lookupCell];
+	var lookupCellValueFromSheetData = sheetDataofLookupCell[lookupCellValue];
+	if(typeof lookupCellValueFromSheetData != 'undefined' && typeof lookupCellValueFromSheetData.merge_field != 'undefined'){
+		var compareableValue = lookupCellValueFromSheetData.merge_field;
+		return value.toLowerCase() == compareableValue.toLowerCase();
+	} 
+	return false; 
+}
 var WDCT_Timeline = {
   errorsCount : 0,
   
@@ -140,8 +151,13 @@ var WDCT_Timeline = {
 					var sheet_data = to_multiArray(wb, sheetName);
 					
 					for(var _indx = data_startindex, len = sheet_data.length; _indx < len; _indx++){
-						lookup_sheets_data[_a][sheet_data[_indx][col]] =  mergeWithCol == null ? 
-								sheet_data[_indx][col]: sheet_data[_indx][col] + ' + ' + sheet_data[_indx][mergeWithCol];
+						//lookup_sheets_data[_a][sheet_data[_indx][col]] =  mergeWithCol == null ? 
+							//	sheet_data[_indx][col]: sheet_data[_indx][col] + dataSeparator + sheet_data[_indx][mergeWithCol];
+						lookup_sheets_data[_a][sheet_data[_indx][col]] =  { value : sheet_data[_indx][col]};
+						if(mergeWithCol != null){
+							lookup_sheets_data[_a][sheet_data[_indx][col]]['merge_field'] = sheet_data[_indx][mergeWithCol];
+						} 
+						
 					}
 					sheetName = null;
 					col = null;
@@ -434,8 +450,6 @@ var WDCT_Timeline = {
 	          			
 	          			
 	          			if(type == 'DUPLICATE'){
-	          			// if it is DUPLICATE TYPE
-	          			console.log("columnDef['dupData']" + columnDef['dupData'][val]);
 	          	          	if(typeof columnDef['dupData'] != UNDEFINED && columnDef['dupData'][val] == 1){
 	          	          		value = value && false;
 	          	          	}else if(typeof columnDef['dupData'] != UNDEFINED){
@@ -462,7 +476,6 @@ var WDCT_Timeline = {
 		        	          	    value = value && true;
 		          				}
 	          				}
-	          				//console.log(reg_pattern.test(val.trim()));
 	          			}else if(type == 'JSFUNCTION_COMPARE'){
 	          				var func = rule;
 	          				if(window[func](val, lookupCellValue)) value = value && false;
@@ -479,6 +492,12 @@ var WDCT_Timeline = {
 	          			}else if(type == 'JSFUNCTION_LOOKUP'){
 	          				var func1 = rule;
 	          				if(!window[func1](columnDef.id, val)) value = value && false;
+	          				else value = value && true, WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
+	          			}else if(type == 'JSORGASSIGN_LOOKUP'){
+	          				var func1 = rule;
+	          				if(window[func1](columnDef.id, val, lookupCell, lookupCellValue)){
+	          					value = value && false;
+	          				}
 	          				else value = value && true, WDCT_Timeline.setDataErrorObj(item, columnDef, true, msg);
 	          			}else if(type == 'JSFUNCTION_INPUT_EQUALS'){
 	          				var filterValue = typeof columnDef['filterValues'] != UNDEFINED && columnDef['filterValues']; 
@@ -599,39 +618,25 @@ var WDCT_Timeline = {
     	var ranges = [];
     	//remove previous selected
     	WDCT_Timeline.removeSelection();
-    	//console.log(row);
     	ranges.push(new Slick.Range(row, 1, row, columns.length - 1));
-    	//console.log(ranges);
     	grid.getSelectionModel().setSelectedRanges(ranges);
     	
     },
     
     contextMenuClickHandler:function (e) {
-        //alert($(e.target).is("button"));
     	e.stopPropagation();
-    	//e.cancelBubble();
-    	
-    	         //console.log('in'); 
                  if (!$(e.target).is("button")) {
                      return;
                  }
-                 //console.log('in 1');
                  if (!grid.getEditorLock().commitCurrentEdit()) {
                      return;
                  }
-                 //console.log('in 2');
-                
                  if ($(e.target).is("button")) {
                      var context_data = $(this).data("data");
-                     var val = typeof $(e.target).attr("data") == UNDEFINED ? '' : $(e.target).attr("data");
-                     //console.log(context_data);
-                     
+                     var val = typeof $(e.target).attr("data") == UNDEFINED ? '' : $(e.target).attr("data");                     
                      if (context_data.range.length > 0) {
                          var from = context_data.range[0];
-                         
                          dataView.beginUpdate();
-                         
-                          
                          for (var i = 0; i <= from.toRow - from.fromRow; i++) {
                               
                               for (var j = 0; j <= from.toCell - from.fromCell; j++) {
@@ -916,7 +921,6 @@ var WDCT_Timeline = {
     
     renderGrid: function(){
     	grid.render();
-        //console.log('me render');
         WDCT_Timeline.setAndDisplayErrorCount();
     },
     validateFormatter: function(row, cell, value, columnDef, dataContext) {
@@ -924,8 +928,6 @@ var WDCT_Timeline = {
     		//return row + 1;
     		return "<div onclick='WDCT_Timeline.onRowClickHandler(event," + row + ");' style='height:100%;width:100%;'>" + (row + 1) + "</div>";
     	}
-    	//console.log(dataContext.id + ':::::' + columnDef.field);
-    	//console.log(dataErr[dataContext.id][columnDef.field].error);
     	if(dataErr[dataContext.id][columnDef.field].error){
     		return "<div class='frmt-invalid' title='" + Object.keys(dataErr[row][cell].msg).join(';') + "' style='width:100%;'>" + value + "</div>";
     	}
@@ -956,7 +958,6 @@ var WDCT_Timeline = {
                         
                         var rowId = data[to.fromRow + i].id;
                         var field = columns[to.fromCell + j].field;
-                        //console.log(val);
                         data[to.fromRow + i][columns[to.fromCell + j].field] = val;
                         grid.invalidateRow(to.fromRow + i);
                         
@@ -1073,16 +1074,11 @@ var WDCT_Timeline = {
 		
 		var rowArray = [];    	
 		for(var _indx = 0, _indxLen = columns.length; _indx < _indxLen; _indx++){
-			//console.log(columns[_indx].name);
-			//console.log(rowArray);
 			if(columns[_indx].name.trim() == '') continue;
 			
 			rowArray.push(WDCT_Timeline.escapeCell(columns[_indx].name));
-			//console.log(WDCT_Timeline.escapeCell(columns[_indx].name));
 		}
-		//console.log(columns.length + '===' + rowArray.length);
 		var rowStr = rowArray.join(',');
-		//console.log(rowStr);
 		xlsx_ws.push(rowStr);
 		
 		

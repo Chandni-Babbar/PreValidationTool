@@ -27,32 +27,34 @@ var WDCT_REGEX = {
         ,"COUNTRYCODEFORMATREGEX" : {"USA":/^\d{3}$/,"IND":/^\d{2,4}$/,"GBR":/^[0]?\d{2,5}$/}
 }
 
-
 var WDCT_Validator = {
    validatingColumn: "0",
    columns: {
 	   "1" : {
 		      "VALIDATIONS" : {
-		    	              "find-blank" :{
-		    	            	      "TYPE" : "REGEX"
-		    	            	      ,"VALIDATIONRULE" : WDCT_REGEX.BLANK
-			    	                  ,"MSG" : "Value cannot be blank"
-			    	                  ,"MENUITEMLABEL" : "blanks"
-			    	                  ,"LOOKUPINDEX": ""	  
-		                           },
-		                       "find-dup" : {
-		                    	    
-		                    	          "TYPE" : "DUPLICATE"
-			    	            	      ,"VALIDATIONRULE" : WDCT_REGEX.BLANK
-				    	                  ,"MSG" : "Value cannot be duplicate"
-				    	                  ,"MENUITEMLABEL" : "duplicates"
-				    	                  ,"LOOKUPINDEX": ""
-		                           }    
-		      }
-		     
+		      	"find-blank" :{
+		      		"TYPE" : "REGEX"
+					,"VALIDATIONRULE" : WDCT_REGEX.BLANK
+					,"MSG" : "Value cannot be blank"
+					,"MENUITEMLABEL" : "Blanks"
+					,"LOOKUPINDEX": ""	  
+				},
+				"find-dup" : {
+					"TYPE" : "DUPLICATE"
+					,"VALIDATIONRULE" : ""
+					,"MSG" : "Value cannot be duplicate"
+					,"MENUITEMLABEL" : "Duplicates"
+					,"LOOKUPINDEX": ""
+				},
+				"find-input-val" : {
+					"TYPE" : "JSFUNCTION_INPUT_EQUALS"
+					,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
+					,"MSG" : ""
+					,"MENUITEMLABEL" : "Value equals to "
+					,"LOOKUPINDEX": ""
+				}    
+			}
 	   },
-
-
 	   "2" : {
 		      "VALIDATIONS" : {
 		      	"find-WKDYSPC" :{
@@ -61,12 +63,12 @@ var WDCT_Validator = {
 					,"MSG" : "Invalid Employee Type"
 					,"MENUITEMLABEL" : "Invalid Employee Type"
 					,"LOOKUPINDEX": ""	  
-					},
-					"find-input-val" : {
+				},
+				"find-input-val" : {
 					"TYPE" : "JSFUNCTION_INPUT_EQUALS"
 					,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
 					,"MSG" : ""
-					,"MENUITEMLABEL" : "value equals to "
+					,"MENUITEMLABEL" : "Value equals to "
 					,"LOOKUPINDEX": ""
 				}
 		    }
@@ -79,95 +81,91 @@ var WDCT_Validator = {
 					,"MSG" : "Invalid Employee Status"
 					,"MENUITEMLABEL" : "Invalid Employee Status"
 					,"LOOKUPINDEX": ""	  
-					},
-					"find-input-val" : {
+				},
+				"find-input-val" : {
 					"TYPE" : "JSFUNCTION_INPUT_EQUALS"
 					,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
 					,"MSG" : ""
-					,"MENUITEMLABEL" : "value equals to "
+					,"MENUITEMLABEL" : "Value equals to "
 					,"LOOKUPINDEX": ""
 				}
 		    }
 	   },
-
-
-
-
-	   
 	   "4" : {
 		      "VALIDATIONS" : {
-					    	  
-					    	  "find-blank" :{
-			            	      "TYPE" : "REGEX"
-			            	      ,"VALIDATIONRULE" : WDCT_REGEX.BLANK
-				                  ,"MSG" : "Value cannot be blank"
-				                  ,"MENUITEMLABEL" : "blanks"
-				                  ,"LOOKUPINDEX": ""	  
-			                   },
-			                   "find-dates" :{
-				            	      "TYPE" : "REGEX"
-				            	      ,"VALIDATIONRULE" : WDCT_REGEX["MM/DD/YYYY"]
-					                  ,"MSG" : "Value does not match mm/dd/yyyy format"
-					                  ,"MENUITEMLABEL" : "format not equal to mm/dd/yyyy"
-					                  ,"LOOKUPINDEX": ""	  
-				               },
-				              "find-date-compare" : {
-												   "TYPE" : "JSFUNCTION_COMPARE"
-												   ,"VALIDATIONRULE" : "A_DATESHOULDLESSTHAN_B"
-												   ,"MSG" : "Value cannot be after term date"
-						    	                   ,"MENUITEMLABEL" : "date greater than term date"
-						    	                   ,"LOOKUPINDEX": "252" 	   
-												}
-		                      }
-	   },
-	   
-	   "6" : {
-		      "VALIDATIONS" : {
-					    	  
-					    	  "find-blank" :{
-			            	      "TYPE" : "REGEX"
-			            	      ,"VALIDATIONRULE" : WDCT_REGEX.BLANK
-				                  ,"MSG" : "Value cannot be blank"
-				                  ,"MENUITEMLABEL" : "blanks"
-				                  ,"LOOKUPINDEX": ""	  
-			                   },
-			                   "find-input-val" : {
-								   "TYPE" : "JSFUNCTION_INPUT_EQUALS"
-								   ,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
-								   ,"MSG" : ""
-		    	                   ,"MENUITEMLABEL" : "value equals to "
-		    	                   ,"LOOKUPINDEX": "" 	   
-								},
-				              "find-lookup-sheet-value" : {
-												   "TYPE" : "JSFUNCTION_LOOKUP"
-												   ,"VALIDATIONRULE" : "VALIDATE_LOOUPSHEETDATA"
-												   ,"MSG" : "Value should be in related sheet"
-						    	                   ,"MENUITEMLABEL" : "value doesnot exist in respective sheet"
-						    	                   ,"LOOKUPINDEX": "" 	   
-												}
-		                      }
-	   },
-	   
-	   "7" : {
-		      "VALIDATIONS" : {
-					    	  
-					    	  "find-blank" :{
-			            	      "TYPE" : "REGEX"
-			            	      ,"VALIDATIONRULE" : WDCT_REGEX.BLANK
-				                  ,"MSG" : "Value cannot be blank"
-				                  ,"MENUITEMLABEL" : "blanks"
-				                  ,"LOOKUPINDEX": ""	  
-			                   },
-			                   
-				              "find-lookup-sheet-value" : {
-												   "TYPE" : "JSFUNCTION_LOOKUP"
-												   ,"VALIDATIONRULE" : "VALIDATE_LOOUPSHEETDATA"
-												   ,"MSG" : "Value should be in related sheet"
-						    	                   ,"MENUITEMLABEL" : "value doesnot exist in respective sheet"
-						    	                   ,"LOOKUPINDEX": "" 	   
-												}
-		                      }
-	   },
+				"find-blank" :{
+					"TYPE" : "REGEX"
+					,"VALIDATIONRULE" : WDCT_REGEX.BLANK
+					,"MSG" : "Value cannot be blank"
+					,"MENUITEMLABEL" : "Blanks"
+					,"LOOKUPINDEX": ""	  
+				},
+				"find-dates" :{
+					"TYPE" : "REGEX"
+					,"VALIDATIONRULE" : WDCT_REGEX["MM/DD/YYYY"]
+					,"MSG" : "Value does not match mm/dd/yyyy format"
+					,"MENUITEMLABEL" : "Format not equal to mm/dd/yyyy"
+					,"LOOKUPINDEX": ""	  
+				},
+				"find-date-compare" : {
+					"TYPE" : "JSFUNCTION_COMPARE"
+					,"VALIDATIONRULE" : "A_DATESHOULDLESSTHAN_B"
+					,"MSG" : "Hire Date cannot be after termination date"
+					,"MENUITEMLABEL" : "Date greater than termination date"
+					,"LOOKUPINDEX": "252" 	   
+				}
+			}
+		},
+		"6" : {
+			"VALIDATIONS" : {
+				"find-blank" :{
+					"TYPE" : "REGEX"
+					,"VALIDATIONRULE" : WDCT_REGEX.BLANK
+					,"MSG" : "Value cannot be blank"
+					,"MENUITEMLABEL" : "blanks"
+					,"LOOKUPINDEX": ""	  
+				},
+				"find-input-val" : {
+					"TYPE" : "JSFUNCTION_INPUT_EQUALS"
+					,"VALIDATIONRULE" : "FILTER_A_EQUALS_B"
+					,"MSG" : ""
+					,"MENUITEMLABEL" : "value equals to "
+					,"LOOKUPINDEX": "" 	   
+				},
+				"find-lookup-sheet-value" : {
+					"TYPE" : "JSFUNCTION_LOOKUP"
+					,"VALIDATIONRULE" : "VALIDATE_LOOUPSHEETDATA"
+					,"MSG" : "Value should be in related sheet"
+					,"MENUITEMLABEL" : "value doesnot exist in respective sheet"
+					,"LOOKUPINDEX": "" 	   
+				}
+			}
+		},
+		"7" : {
+			"VALIDATIONS" : {
+				"find-blank" :{
+					"TYPE" : "REGEX"
+					,"VALIDATIONRULE" : WDCT_REGEX.BLANK
+					,"MSG" : "Value cannot be blank"
+					,"MENUITEMLABEL" : "Blanks"
+					,"LOOKUPINDEX": ""	  
+				},
+				"find-lookup-sheet-value" : {
+					"TYPE" : "JSFUNCTION_LOOKUP"
+					,"VALIDATIONRULE" : "VALIDATE_LOOUPSHEETDATA"
+					,"MSG" : "Value should be in related sheet"
+					,"MENUITEMLABEL" : "Value doesnot exist in respective sheet"
+					,"LOOKUPINDEX": ""
+				},
+				"find-org-assignment" : {
+					"TYPE" : "JSORGASSIGN_LOOKUP"
+					,"VALIDATIONRULE" : "VALIDATE_LOOUPSHEETDATACOMPARE"
+					,"MSG" : "Org assignment in Position sheet is different from this sheet for specified position"
+					,"MENUITEMLABEL" : "mismatch from position selected"
+					,"LOOKUPINDEX": "132"
+				}
+			}
+		},
 	   
 	   "8" : {
 		      "VALIDATIONS" : {
@@ -526,7 +524,8 @@ var WDCT_LookUpConfig = {
 		},
 		"132": {
 			"sheet" : "POSITIONS",
-			"col": 7
+			"col": 7,
+			"display": { mergeWithCol : 3} 
 		},
 		"134": {
 			"sheet" : "JOB PROFILES",
