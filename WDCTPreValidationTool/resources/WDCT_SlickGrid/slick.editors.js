@@ -68,7 +68,9 @@
 		    	  arr.sort();
 		    	  $select.append($("<OPTION value=''>Select</OPTION>"));
 		    	  for(var _indx = 0, _indxLen = arr.length; _indx < _indxLen; _indx++){
-		    		  $select.append($("<OPTION value='" + arr[_indx] + "'>" + sheetData[arr[_indx]] + "</OPTION>"));
+		    		  $select.append($("<OPTION value='" + arr[_indx] + "'>" + sheetData[arr[_indx]].value + 
+                (typeof sheetData[arr[_indx]].merge_field != 'undefined' ? dataSeparator + sheetData[arr[_indx]].merge_field : '') +
+                 "</OPTION>"));
 		    	  }
 	    	  
 	 	  }
