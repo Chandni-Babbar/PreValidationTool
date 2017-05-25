@@ -152,7 +152,7 @@ var WDCT_Timeline = {
 			columnArr = res[columnArrRowIndex];
 			contextArr = res[contextArrRowIndex];
 			dataTypeArr = res[dataTypeArrRowIndex];
-			requredArr = res[requredArrRowIndex];
+			//requredArr = res[requredArrRowIndex];
 			
 			columns = [];
 			
@@ -160,7 +160,7 @@ var WDCT_Timeline = {
 				var col = columnArr[_indx];
 				// do not push column where column name is not defined
 				if(col.trim() == '') continue;
-				columns.push(WDCT_Timeline.getColumnDefination(_indx, _indx, col, dataTypeArr[_indx], requredArr[_indx], contextArr[_indx]));
+				columns.push(WDCT_Timeline.getColumnDefination(_indx, _indx, col, dataTypeArr[_indx], contextArr[_indx]));
 			}
 			global_wb = null;
 			wb = null;
@@ -813,7 +813,7 @@ var WDCT_Timeline = {
   },	
   
   
-  getColumnDefination: function(id, field, name, dataTypeText, requiredText, contextText){
+  getColumnDefination: function(id, field, name, dataTypeText, contextText){
 	 var defaultEditor =  Slick.Editors.Text;
 	 
 	 
@@ -864,11 +864,11 @@ var WDCT_Timeline = {
          
      }
 	 
-	 if(typeof requiredText != UNDEFINED && requiredText.toLowerCase() == 'required'){
-		 column.header.buttons.push({
-		        image: "../resources/WDCT_SlickGrid/images/exclamation-red-icon.png"
-	     });
-	 }
+	 //if(typeof requiredText != UNDEFINED && requiredText.toLowerCase() == 'required'){
+	//	 column.header.buttons.push({
+	//	        image: "../resources/WDCT_SlickGrid/images/exclamation-red-icon.png"
+	//     });
+	// }
 	 
 	 column.header.buttons.push({
          image: "../resources/WDCT_SlickGrid/images/help.png",
